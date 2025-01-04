@@ -1,28 +1,40 @@
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
+
+import eyePasswordShow from "../../public/images/eye-password-show.svg";
+import eyePasswordHide from "../../public/images/eye-password-hide.svg";
 
 export default function LoginPage() {
-  // State variables to hold the form values
   const [username, setUsername] = useState("");
-  const [role, setRole] = useState("ADMIN");
-  const [error, setError] = useState(""); // For error messages
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false); 
+  const [error, setError] = useState("");
 
-  // Handle form submission
+  const mockUsers = [
+    { username: "adminUser", password: "adminPass", role: "ADMIN" },
+    { username: "registrarUser", password: "registrarPass", role: "REGISTRAR" },
+    { username: "officialUser", password: "officialPass", role: "OFFICIAL" },
+  ];
+
+  const roleDashboardMap = {
+    ADMIN: "/admindashboard",
+    REGISTRAR: "/registrardashboard",
+    OFFICIAL: "/officialdashboard",
+  };
+
   const handleLogin = (e) => {
     e.preventDefault();
+    const user = mockUsers.find(
+      (u) =>
+        u.username.toLowerCase() === username.toLowerCase() &&
+        u.password === password
+    );
 
-    // Role-based dashboard mapping
-    const roleDashboardMap = {
-      ADMIN: "/admindashboard",
-      REGISTRAR: "/registrardashboard",
-      OFFICIAL: "/officialdashboard",
-    };
-
-    // Check if the role exists and redirect
-    if (role in roleDashboardMap) {
-      window.location.href = roleDashboardMap[role];
+    if (user) {
+      window.location.href = roleDashboardMap[user.role];
     } else {
-      setError("Invalid role selected.");
+      setError("Invalid username or password. Please try again.");
     }
   };
 
@@ -32,8 +44,6 @@ export default function LoginPage() {
         <h1 className="text-4xl font-bold text-white mb-6">
           Vital Events Registering System
         </h1>
-
-        {/* Login Form */}
         <form
           onSubmit={handleLogin}
           className="w-full max-w-sm space-y-6 p-6 rounded-lg shadow-lg bg-white"
@@ -50,27 +60,39 @@ export default function LoginPage() {
               id="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full p-3 mt-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 mt-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
               required
             />
           </div>
           <div>
             <label
-              htmlFor="role"
+              htmlFor="password"
               className="block text-xl text-gray-800 font-semibold"
             >
-              Select Role
+              Password
             </label>
-            <select
-              id="role"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="w-full p-3 mt-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
-            >
-              <option value="ADMIN">Admin</option>
-              <option value="REGISTRAR">Registrar</option>
-              <option value="OFFICIAL">Official</option>
-            </select>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full p-3 mt-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-3 flex items-center"
+              >
+                <Image
+                  src={showPassword ? eyePasswordShow : eyePasswordHide}
+                  alt="Toggle Password Visibility"
+                  width={24}
+                  height={24}
+                />
+              </button>
+            </div>
           </div>
           {error && <div className="text-red-500 text-sm">{error}</div>}
           <button
@@ -81,8 +103,6 @@ export default function LoginPage() {
           </button>
         </form>
       </div>
-
-      {/* Link to About Page */}
       <div className="mt-4 flex justify-center">
         <Link
           href="/about"
