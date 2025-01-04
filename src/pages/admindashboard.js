@@ -5,16 +5,8 @@ export default function OfficialDashboardPage() {
     <div className="flex h-screen">
       {/* Sidebar */}
       <div className="w-64 bg-gray-800 text-white p-6">
-        <h2 className="text-2xl font-bold mb-6">Official Dashboard</h2>
+        <h2 className="text-2xl font-bold mb-6">Admin Dashboard</h2>
         <ul className="space-y-4">
-          <li>
-            <Link
-              href="/admindashboard"
-              className="flex items-center gap-2 text-white hover:text-gray-300 transition duration-200"
-            >
-              <span>🏠</span> Home
-            </Link>
-          </li>
           <li>
             <Link
               href="/about"
@@ -38,7 +30,7 @@ export default function OfficialDashboardPage() {
       <div className="flex-1 bg-gray-100 p-8">
         {/* Header */}
         <header className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-semibold">Welcome, Official</h1>
+          <h1 className="text-3xl font-semibold">Welcome, Admin</h1>
           <button
             onClick={() => {
               if (window.confirm("Are you sure you want to logout?")) {
@@ -54,18 +46,14 @@ export default function OfficialDashboardPage() {
         {/* Main Section */}
         <section>
           <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-            Manage Registrars
+            Manage Users
           </h2>
-          <p className="text-gray-700 mb-6">
-            Perform actions to manage registrars in the system.
-          </p>
-
           {/* Action Buttons */}
           <div className="space-y-4">
             {/* Button to Add a Registrar */}
             <button
               onClick={() => (window.location.href = "/add-user")}
-              className="block w-full max-w-sm p-4 bg-green-500 text-white text-center font-semibold rounded-lg hover:bg-green-600 transition duration-300"
+              className="block w-full max-w-sm p-4 bg-blue-500 text-white text-center font-semibold rounded-lg hover:bg-blue-600 transition duration-300"
             >
               Add a User
             </button>
@@ -73,7 +61,7 @@ export default function OfficialDashboardPage() {
             {/* Button to Remove a Registrar */}
             <button
               onClick={() => (window.location.href = "/search-remove-user")}
-              className="block w-full max-w-sm p-4 bg-red-500 text-white text-center font-semibold rounded-lg hover:bg-red-600 transition duration-300"
+              className="block w-full max-w-sm p-4 bg-blue-500 text-white text-center font-semibold rounded-lg hover:bg-blue-600 transition duration-300"
             >
               Remove a User
             </button>

@@ -1,33 +1,76 @@
-export default function About() {
+import React from "react";
+
+const About = () => {
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
-      <h1 className="text-3xl font-semibold text-center mb-6">
-        About the Vital Events System
-      </h1>
-      <p className="text-gray-700 text-lg mb-6">
-        The Vital Events Registration System is designed to record and manage
-        significant life events, such as births, deaths, marriages, and
-        divorces. This system ensures that individuals have a formal record of
-        these events for legal, statistical, and personal purposes.
+    <div className="container mx-auto py-10 px-6">
+      <h1 className="text-4xl font-bold mb-6">About Us</h1>
+      <p className="text-lg mb-4 text-black">
+        Welcome to the{" "}
+        <strong>Electronic Vital Events Registration Program</strong> for the
+        Federal Democratic Republic of Ethiopia (FDRE). Our mission is to
+        revolutionize the way vital life events are recorded, managed, and
+        utilized across Ethiopia by leveraging the power of technology.
       </p>
-      <h2 className="text-2xl font-semibold text-gray-800 mb-4">Features</h2>
-      <ul className="list-disc pl-6 text-gray-700 mb-6">
-        <li>Secure and reliable registration of vital events.</li>
-        <li>Easy search and retrieval of records.</li>
-        <li>Compliant with legal and government standards.</li>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4 text-black">
+        Our Purpose
+      </h2>
+      <p className="text-lg mb-4 text-black">
+        The registration of vital events, including births, deaths, marriages,
+        divorces, and adoptions, is essential for personal identity, governance,
+        and public planning. Historically, manual paper-based systems have led
+        to inefficiencies, data loss, and delays. Our program addresses these
+        challenges with a centralized, automated solution focused on accuracy,
+        security, and ease of use.
+      </p>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4 text-black">
+        What We Do
+      </h2>
+      <ul className="list-disc list-inside space-y-2 text-lg text-black">
+        <li>
+          Provide comprehensive event registration with mandatory fields to
+          ensure data completeness.
+        </li>
+        <li>
+          Maintain a centralized database for secure and accessible data
+          management.
+        </li>
+        <li>
+          Enable role-based access control and encryption for system security.
+        </li>
+        <li>Simplify certificate issuance for registered events.</li>
+        <li>
+          Generate detailed statistical reports for government planning and
+          policymaking.
+        </li>
       </ul>
-      <p className="text-gray-700 mb-6">
-        Our system is built with the latest technologies to provide a
-        user-friendly and efficient experience for all users.
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4 text-black">
+        Why It Matters
+      </h2>
+      <p className="text-lg mb-4 text-black">
+        Our system benefits Ethiopian citizens by providing legal documentation,
+        accurate population statistics, and reliable records for legal and
+        policy-related matters. For government institutions, it enhances
+        planning and decision-making by ensuring data integrity and
+        accessibility.
       </p>
-      <p className="text-center">
-        <a
-          href="/login"
-          className="text-blue-500 underline hover:text-blue-700 transition duration-200"
-        >
-          Back to Login
-        </a>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4 text-black">
+        Our Vision
+      </h2>
+      <p className="text-lg mb-4 text-black">
+        We envision Ethiopia leading the way in digital civil registration,
+        ensuring every citizen’s rights and identity are recognized through
+        reliable, secure, and efficient data systems.
+      </p>
+
+      <p className="text-lg mt-8 text-black">
+        Thank you for joining us in building a better-connected Ethiopia.
       </p>
     </div>
   );
-}
+};
+
+export default About;

@@ -9,14 +9,6 @@ export default function OfficialDashboardPage() {
         <ul className="space-y-4">
           <li>
             <Link
-              href="/dashboard"
-              className="flex items-center gap-2 text-white hover:text-gray-300 transition duration-200"
-            >
-              <span>🏠</span> Home
-            </Link>
-          </li>
-          <li>
-            <Link
               href="/about"
               className="flex items-center gap-2 text-white hover:text-gray-300 transition duration-200"
             >
@@ -57,7 +49,8 @@ export default function OfficialDashboardPage() {
             Generate Reports
           </h2>
           <p className="text-gray-700 mb-6">
-            Use the button below to generate detailed reports for vital events. This functionality is exclusive to officials.
+            Use the button below to generate detailed reports for vital events.
+            This functionality is exclusive to officials.
           </p>
 
           {/* Action Button */}

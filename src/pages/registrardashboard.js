@@ -11,14 +11,6 @@ export default function DashboardPage() {
             <ul className="space-y-4">
               <li>
                 <Link
-                  href="/registrardashboard"
-                  className="flex items-center gap-2 text-white hover:text-gray-300 transition duration-200"
-                >
-                  <span>🏠</span> Home
-                </Link>
-              </li>
-              <li>
-                <Link
                   href="/about"
                   className="flex items-center gap-2 text-white hover:text-gray-300 transition duration-200"
                 >
