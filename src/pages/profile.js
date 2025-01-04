@@ -1,114 +1,150 @@
-export default function ProfilePage() {
-    return (
-      <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
-        <h1 className="text-3xl font-semibold text-center mb-6">Your Profile</h1>
-        
-        {/* Profile Info Section */}
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Personal Information</h2>
-          <div className="space-y-4">
-            <div className="flex justify-between">
-              <span className="font-medium text-gray-700">Full Name</span>
-              <span className="text-gray-600">John Doe</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="font-medium text-gray-700">Username</span>
-              <span className="text-gray-600">johndoe123</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="font-medium text-gray-700">Email</span>
-              <span className="text-gray-600">johndoe@example.com</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="font-medium text-gray-700">Date of Birth</span>
-              <span className="text-gray-600">01/01/1990</span>
-            </div>
-          </div>
-        </div>
-        
-        {/* Update Info Section */}
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Update Profile</h2>
-          <form className="space-y-4">
-            <div>
-              <label htmlFor="full-name" className="block text-xl text-gray-700 font-semibold">Full Name</label>
-              <input
-                type="text"
-                id="full-name"
-                name="full-name"
-                className="w-full p-3 mt-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                defaultValue="John Doe"
-              />
-            </div>
-            <div>
-              <label htmlFor="email" className="block text-xl text-gray-700 font-semibold">Email</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                className="w-full p-3 mt-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                defaultValue="johndoe@example.com"
-              />
-            </div>
-            <div>
-              <label htmlFor="dob" className="block text-xl text-gray-700 font-semibold">Date of Birth</label>
-              <input
-                type="date"
-                id="dob"
-                name="dob"
-                className="w-full p-3 mt-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                defaultValue="1990-01-01"
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full p-3 mt-6 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition duration-300"
-            >
-              Save Changes
-            </button>
-          </form>
-        </div>
-  
-        {/* Password Change Section */}
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Change Password</h2>
-          <form className="space-y-4">
-            <div>
-              <label htmlFor="current-password" className="block text-xl text-gray-700 font-semibold">Current Password</label>
-              <input
-                type="password"
-                id="current-password"
-                name="current-password"
-                className="w-full p-3 mt-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label htmlFor="new-password" className="block text-xl text-gray-700 font-semibold">New Password</label>
-              <input
-                type="password"
-                id="new-password"
-                name="new-password"
-                className="w-full p-3 mt-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label htmlFor="confirm-password" className="block text-xl text-gray-700 font-semibold">Confirm New Password</label>
-              <input
-                type="password"
-                id="confirm-password"
-                name="confirm-password"
-                className="w-full p-3 mt-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full p-3 mt-6 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition duration-300"
-            >
-              Change Password
-            </button>
-          </form>
+import { useState, useEffect } from "react";
+import InputField from "../components/InputField";
+import SelectField from "../components/SelectField";
+import SectionHeader from "../components/SectionHeader";
+
+export default function ProfilePage({ user }) {
+  const [profileData, setProfileData] = useState({
+    username: "",
+    email: "",
+    role: "registrar", // Default role
+  });
+
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  const [passwordError, setPasswordError] = useState("");
+
+  useEffect(() => {
+    if (user) {
+      setProfileData({
+        username: user.username || "",
+        email: user.email || "",
+        role: user.role || "registrar",
+      });
+    }
+  }, [user]);
+
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+    if (name === "newPassword" || name === "confirmPassword") {
+      setPasswordError(
+        name === "confirmPassword" && passwordData.newPassword !== value
+          ? "Passwords do not match."
+          : ""
+      );
+    }
+  };
+
+  const handlePasswordSubmit = (e) => {
+    e.preventDefault();
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordError("Passwords do not match.");
+      return;
+    }
+    console.log("Password Change Data:", passwordData);
+    alert("Password changed successfully.");
+    setPasswordData({
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    });
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
+      <h1 className="text-3xl font-semibold text-center mb-6">Your Profile</h1>
+
+      {/* Personal Information */}
+      <div className="mb-6">
+        <SectionHeader title="Personal Information" />
+        <div className="space-y-4">
+          <InputField
+            label="Username"
+            id="username"
+            value={profileData.username}
+            onChange={() => {}}
+            name="username"
+            required
+            disabled
+          />
+          <InputField
+            label="Email"
+            id="email"
+            value={profileData.email}
+            onChange={() => {}}
+            name="email"
+            type="email"
+            required
+            disabled
+          />
+          <SelectField
+            label="Role"
+            id="role"
+            value={profileData.role}
+            onChange={() => {}}
+            name="role"
+            options={[
+              { value: "registrar", label: "Registrar" },
+              { value: "official", label: "Official" },
+              { value: "admin", label: "Admin" },
+            ]}
+            disabled
+          />
         </div>
       </div>
-    );
-  }
-  
+
+      {/* Password Change */}
+      <div className="mb-6">
+        <SectionHeader title="Change Password" />
+        <form onSubmit={handlePasswordSubmit}>
+          <div className="space-y-4">
+            <InputField
+              label="Current Password"
+              id="current-password"
+              value={passwordData.currentPassword}
+              onChange={handlePasswordChange}
+              name="currentPassword"
+              type="password"
+              required
+            />
+            <InputField
+              label="New Password"
+              id="new-password"
+              value={passwordData.newPassword}
+              onChange={handlePasswordChange}
+              name="newPassword"
+              type="password"
+              required
+            />
+            <InputField
+              label="Confirm New Password"
+              id="confirm-password"
+              value={passwordData.confirmPassword}
+              onChange={handlePasswordChange}
+              name="confirmPassword"
+              type="password"
+              required
+            />
+            {passwordError && (
+              <p className="text-red-500 text-sm">{passwordError}</p>
+            )}
+          </div>
+          <button
+            type="submit"
+            className="w-full p-3 mt-6 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition duration-300"
+          >
+            Change Password
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
