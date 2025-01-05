@@ -106,7 +106,7 @@ export default function LoginPage() {
       <div className="mt-4 flex justify-center">
         <Link
           href="/about"
-          className="text-lg text-white underline hover:text-blue-200 transition duration-200"
+          className="text-lg text-black underline hover:text-blue-200 transition duration-200"
         >
           Go to About Page
         </Link>
