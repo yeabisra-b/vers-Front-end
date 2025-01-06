@@ -1,3 +1,4 @@
+import InputBox from "@/components/InputBox";
 import { useState } from "react";
 
 export default function TempPage() {
@@ -243,70 +244,32 @@ export default function TempPage() {
             {/* Name Fields */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               {/* First Name */}
-              <div>
-                <label
-                  htmlFor="first-name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  First Name
-                </label>
-                <input
-                  id="first-name"
-                  type="text"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full p-3 mt-1 border rounded-lg text-black"
-                />
-                {fieldErrors.firstName && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {fieldErrors.firstName}
-                  </p>
-                )}
-              </div>
-
+              <InputBox
+                name={"FirstName"}
+                id={"first-name"}
+                type={"text"}
+                fieldErrors={fieldErrors.firstName}
+                value={firstName}
+                setFunc={setFirstName}
+              />
               {/* Middle Name */}
-              <div>
-                <label
-                  htmlFor="middle-name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Middle Name
-                </label>
-                <input
-                  id="middle-name"
-                  type="text"
-                  value={middleName}
-                  onChange={(e) => setMiddleName(e.target.value)}
-                  className="w-full p-3 mt-1 border rounded-lg text-black"
-                />
-                {fieldErrors.middleName && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {fieldErrors.middleName}
-                  </p>
-                )}
-              </div>
-
+              <InputBox
+                name={"Middle Name"}
+                id={"middle-name"}
+                type={"text"}
+                fieldErrors={fieldErrors.middleName}
+                value={middleName}
+                setFunc={setMiddleName}
+              />
               {/* Last Name */}
-              <div>
-                <label
-                  htmlFor="last-name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Last Name
-                </label>
-                <input
-                  id="last-name"
-                  type="text"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  className="w-full p-3 mt-1 border rounded-lg text-black"
-                />
-                {fieldErrors.lastName && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {fieldErrors.lastName}
-                  </p>
-                )}
-              </div>
+              <InputBox
+                name={"Last Name"}
+                id={"last-name"}
+                type={"text"}
+                fieldErrors={fieldErrors.lastName}
+                value={lastName}
+                setFunc={setLastName}
+              />
             </div>
 
             {/* Gender Field */}
@@ -338,208 +301,100 @@ export default function TempPage() {
             {/* Mother's Information */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6">
               {/* Mother's First Name */}
-              <div>
-                <label
-                  htmlFor="mother-first-name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Mother's First Name
-                </label>
-                <input
-                  id="mother-first-name"
-                  type="text"
-                  value={motherFirstName}
-                  onChange={(e) => setMotherFirstName(e.target.value)}
-                  className="w-full p-3 mt-1 border rounded-lg text-black"
-                />
-                {fieldErrors.motherFirstName && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {fieldErrors.motherFirstName}
-                  </p>
-                )}
-              </div>
+              <InputBox
+                name="Mother's First Name"
+                id="mother-first-name"
+                type="text"
+                value={motherFirstName}
+                setFunc={setMotherFirstName}
+                fieldErrors={fieldErrors.motherFirstName}
+              />
 
               {/* Mother's Middle Name */}
-              <div>
-                <label
-                  htmlFor="mother-middle-name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Mother's Middle Name
-                </label>
-                <input
-                  id="mother-middle-name"
-                  type="text"
-                  value={motherMiddleName}
-                  onChange={(e) => setMotherMiddleName(e.target.value)}
-                  className="w-full p-3 mt-1 border rounded-lg text-black"
-                />
-                {fieldErrors.motherMiddleName && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {fieldErrors.motherMiddleName}
-                  </p>
-                )}
-              </div>
+              <InputBox
+                name="Mother's Middle Name"
+                id="mother-middle-name"
+                type="text"
+                value={motherMiddleName}
+                setFunc={setMotherMiddleName}
+                fieldErrors={fieldErrors.motherMiddleName}
+              />
 
               {/* Mother's Last Name */}
-              <div>
-                <label
-                  htmlFor="mother-last-name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Mother's Last Name
-                </label>
-                <input
-                  id="mother-last-name"
-                  type="text"
-                  value={motherLastName}
-                  onChange={(e) => setMotherLastName(e.target.value)}
-                  className="w-full p-3 mt-1 border rounded-lg text-black"
-                />
-                {fieldErrors.motherLastName && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {fieldErrors.motherLastName}
-                  </p>
-                )}
-              </div>
+              <InputBox
+                name="Mother's Last Name"
+                id="mother-last-name"
+                type="text"
+                value={motherLastName}
+                setFunc={setMotherLastName}
+                fieldErrors={fieldErrors.motherLastName}
+              />
             </div>
 
             {/* Address Details */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6">
               {/* Region */}
-              <div>
-                <label
-                  htmlFor="region"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Region
-                </label>
-                <input
-                  id="region"
-                  type="text"
-                  value={region}
-                  onChange={(e) => setRegion(e.target.value)}
-                  className="w-full p-3 mt-1 border rounded-lg text-black"
-                />
-                {fieldErrors.region && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {fieldErrors.region}
-                  </p>
-                )}
-              </div>
+              <InputBox
+                name="Region"
+                id="region"
+                type="text"
+                value={region}
+                setFunc={setRegion}
+                fieldErrors={fieldErrors.region}
+              />
 
               {/* Zone */}
-              <div>
-                <label
-                  htmlFor="zone"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Zone
-                </label>
-                <input
-                  id="zone"
-                  type="text"
-                  value={zone}
-                  onChange={(e) => setZone(e.target.value)}
-                  className="w-full p-3 mt-1 border rounded-lg text-black"
-                />
-                {fieldErrors.zone && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {fieldErrors.zone}
-                  </p>
-                )}
-              </div>
+              <InputBox
+                name="Zone"
+                id="zone"
+                type="text"
+                value={zone}
+                setFunc={setZone}
+                fieldErrors={fieldErrors.zone}
+              />
 
               {/* Woreda */}
-              <div>
-                <label
-                  htmlFor="woreda"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Woreda
-                </label>
-                <input
-                  id="woreda"
-                  type="text"
-                  value={woreda}
-                  onChange={(e) => setWoreda(e.target.value)}
-                  className="w-full p-3 mt-1 border rounded-lg text-black"
-                />
-                {fieldErrors.woreda && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {fieldErrors.woreda}
-                  </p>
-                )}
-              </div>
+              <InputBox
+                name="Woreda"
+                id="woreda"
+                type="text"
+                value={woreda}
+                setFunc={setWoreda}
+                fieldErrors={fieldErrors.woreda}
+              />
             </div>
 
             {/* Remaining Fields */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6">
               {/* Date of Birth */}
-              <div>
-                <label
-                  htmlFor="date-of-birth"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Date of Birth
-                </label>
-                <input
-                  id="date-of-birth"
-                  type="date"
-                  value={dateOfBirth}
-                  onChange={(e) => setDateOfBirth(e.target.value)}
-                  className="w-full p-3 mt-1 border rounded-lg text-black"
-                />
-                {fieldErrors.dateOfBirth && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {fieldErrors.dateOfBirth}
-                  </p>
-                )}
-              </div>
+              <InputBox
+                name="Date of Birth"
+                id="date-of-birth"
+                type="date"
+                value={dateOfBirth}
+                setFunc={setDateOfBirth}
+                fieldErrors={fieldErrors.dateOfBirth}
+              />
 
               {/* Birth Weight */}
-              <div>
-                <label
-                  htmlFor="birth-weight"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Birth Weight (kg)
-                </label>
-                <input
-                  id="birth-weight"
-                  type="text"
-                  value={birthWeight}
-                  onChange={(e) => setBirthWeight(e.target.value)}
-                  className="w-full p-3 mt-1 border rounded-lg text-black"
-                />
-                {fieldErrors.birthWeight && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {fieldErrors.birthWeight}
-                  </p>
-                )}
-              </div>
+              <InputBox
+                name="Birth Weight (kg)"
+                id="birth-weight"
+                type="text"
+                value={birthWeight}
+                setFunc={setBirthWeight}
+                fieldErrors={fieldErrors.birthWeight}
+              />
 
               {/* Phone Number */}
-              <div>
-                <label
-                  htmlFor="phone-number"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Phone Number
-                </label>
-                <input
-                  id="phone-number"
-                  type="text"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  className="w-full p-3 mt-1 border rounded-lg text-black"
-                />
-                {fieldErrors.phoneNumber && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {fieldErrors.phoneNumber}
-                  </p>
-                )}
-              </div>
+              <InputBox
+                name="Phone Number"
+                id="phone-number"
+                type="text"
+                value={phoneNumber}
+                setFunc={setPhoneNumber}
+                fieldErrors={fieldErrors.phoneNumber}
+              />
             </div>
           </>
         )}
@@ -550,70 +405,34 @@ export default function TempPage() {
             {/* Name and Gender Fields */}
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
               {/* First Name */}
-              <div>
-                <label
-                  htmlFor="first-name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  First Name
-                </label>
-                <input
-                  id="first-name"
-                  type="text"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full p-3 mt-1 border rounded-lg text-black"
-                />
-                {fieldErrors.firstName && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {fieldErrors.firstName}
-                  </p>
-                )}
-              </div>
+              <InputBox
+                name="First Name"
+                id="first-name"
+                type="text"
+                value={firstName}
+                setFunc={setFirstName}
+                fieldErrors={fieldErrors.firstName}
+              />
 
               {/* Middle Name */}
-              <div>
-                <label
-                  htmlFor="middle-name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Middle Name
-                </label>
-                <input
-                  id="middle-name"
-                  type="text"
-                  value={middleName}
-                  onChange={(e) => setMiddleName(e.target.value)}
-                  className="w-full p-3 mt-1 border rounded-lg text-black"
-                />
-                {fieldErrors.middleName && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {fieldErrors.middleName}
-                  </p>
-                )}
-              </div>
+              <InputBox
+                name="Middle Name"
+                id="middle-name"
+                type="text"
+                value={middleName}
+                setFunc={setMiddleName}
+                fieldErrors={fieldErrors.middleName}
+              />
 
               {/* Last Name */}
-              <div>
-                <label
-                  htmlFor="last-name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Last Name
-                </label>
-                <input
-                  id="last-name"
-                  type="text"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  className="w-full p-3 mt-1 border rounded-lg text-black"
-                />
-                {fieldErrors.lastName && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {fieldErrors.lastName}
-                  </p>
-                )}
-              </div>
+              <InputBox
+                name="Last Name"
+                id="last-name"
+                type="text"
+                value={lastName}
+                setFunc={setLastName}
+                fieldErrors={fieldErrors.lastName}
+              />
 
               {/* Gender */}
               <div>
@@ -643,70 +462,34 @@ export default function TempPage() {
             {/* Declared Name Fields */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6">
               {/* Declared First Name */}
-              <div>
-                <label
-                  htmlFor="declared-first-name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Declared First Name
-                </label>
-                <input
-                  id="declared-first-name"
-                  type="text"
-                  value={declaredFirstName}
-                  onChange={(e) => setDeclaredFirstName(e.target.value)}
-                  className="w-full p-3 mt-1 border rounded-lg text-black"
-                />
-                {fieldErrors.declaredFirstName && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {fieldErrors.declaredFirstName}
-                  </p>
-                )}
-              </div>
+              <InputBox
+                name="Declared First Name"
+                id="declared-first-name"
+                type="text"
+                value={declaredFirstName}
+                setFunc={setDeclaredFirstName}
+                fieldErrors={fieldErrors.declaredFirstName}
+              />
 
               {/* Declared Middle Name */}
-              <div>
-                <label
-                  htmlFor="declared-middle-name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Declared Middle Name
-                </label>
-                <input
-                  id="declared-middle-name"
-                  type="text"
-                  value={declaredMiddleName}
-                  onChange={(e) => setDeclaredMiddleName(e.target.value)}
-                  className="w-full p-3 mt-1 border rounded-lg text-black"
-                />
-                {fieldErrors.declaredMiddleName && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {fieldErrors.declaredMiddleName}
-                  </p>
-                )}
-              </div>
+              <InputBox
+                name="Declared Middle Name"
+                id="declared-middle-name"
+                type="text"
+                value={declaredMiddleName}
+                setFunc={setDeclaredMiddleName}
+                fieldErrors={fieldErrors.declaredMiddleName}
+              />
 
               {/* Declared Last Name */}
-              <div>
-                <label
-                  htmlFor="declared-last-name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Declared Last Name
-                </label>
-                <input
-                  id="declared-last-name"
-                  type="text"
-                  value={declaredLastName}
-                  onChange={(e) => setDeclaredLastName(e.target.value)}
-                  className="w-full p-3 mt-1 border rounded-lg text-black"
-                />
-                {fieldErrors.declaredLastName && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {fieldErrors.declaredLastName}
-                  </p>
-                )}
-              </div>
+              <InputBox
+                name="Declared Last Name"
+                id="declared-last-name"
+                type="text"
+                value={declaredLastName}
+                setFunc={setDeclaredLastName}
+                fieldErrors={fieldErrors.declaredLastName}
+              />
             </div>
 
             {/* Cause of Death */}
@@ -734,117 +517,57 @@ export default function TempPage() {
             {/* Address Fields */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6">
               {/* Region */}
-              <div>
-                <label
-                  htmlFor="death-region"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Region
-                </label>
-                <input
-                  id="death-region"
-                  type="text"
-                  value={deathRegion}
-                  onChange={(e) => setDeathRegion(e.target.value)}
-                  className="w-full p-3 mt-1 border rounded-lg text-black"
-                />
-                {fieldErrors.deathRegion && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {fieldErrors.deathRegion}
-                  </p>
-                )}
-              </div>
+              <InputBox
+                name="Region"
+                id="death-region"
+                type="text"
+                value={deathRegion}
+                setFunc={setDeathRegion}
+                fieldErrors={fieldErrors.deathRegion}
+              />
 
               {/* Zone */}
-              <div>
-                <label
-                  htmlFor="death-zone"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Zone
-                </label>
-                <input
-                  id="death-zone"
-                  type="text"
-                  value={deathZone}
-                  onChange={(e) => setDeathZone(e.target.value)}
-                  className="w-full p-3 mt-1 border rounded-lg text-black"
-                />
-                {fieldErrors.deathZone && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {fieldErrors.deathZone}
-                  </p>
-                )}
-              </div>
+              <InputBox
+                name="Zone"
+                id="death-zone"
+                type="text"
+                value={deathZone}
+                setFunc={setDeathZone}
+                fieldErrors={fieldErrors.deathZone}
+              />
 
               {/* Woreda */}
-              <div>
-                <label
-                  htmlFor="death-woreda"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Woreda
-                </label>
-                <input
-                  id="death-woreda"
-                  type="text"
-                  value={deathWoreda}
-                  onChange={(e) => setDeathWoreda(e.target.value)}
-                  className="w-full p-3 mt-1 border rounded-lg text-black"
-                />
-                {fieldErrors.deathWoreda && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {fieldErrors.deathWoreda}
-                  </p>
-                )}
-              </div>
+              <InputBox
+                name="Woreda"
+                id="death-woreda"
+                type="text"
+                value={deathWoreda}
+                setFunc={setDeathWoreda}
+                fieldErrors={fieldErrors.deathWoreda}
+              />
             </div>
 
             {/* Date of Death and Specific Place */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
               {/* Date of Death */}
-              <div>
-                <label
-                  htmlFor="date-of-death"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Date of Death
-                </label>
-                <input
-                  id="date-of-death"
-                  type="date"
-                  value={dateOfDeath}
-                  onChange={(e) => setDateOfDeath(e.target.value)}
-                  className="w-full p-3 mt-1 border rounded-lg text-black"
-                />
-                {fieldErrors.dateOfDeath && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {fieldErrors.dateOfDeath}
-                  </p>
-                )}
-              </div>
+              <InputBox
+                name="Date of Death"
+                id="date-of-death"
+                type="date"
+                value={dateOfDeath}
+                setFunc={setDateOfDeath}
+                fieldErrors={fieldErrors.dateOfDeath}
+              />
 
               {/* Specific Place of Death */}
-              <div>
-                <label
-                  htmlFor="death-specific-place"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Specific Place of Death
-                </label>
-                <input
-                  id="death-specific-place"
-                  type="text"
-                  value={deathSpecificPlace}
-                  onChange={(e) => setDeathSpecificPlace(e.target.value)}
-                  className="w-full p-3 mt-1 border rounded-lg text-black"
-                />
-                {fieldErrors.deathSpecificPlace && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {fieldErrors.deathSpecificPlace}
-                  </p>
-                )}
-              </div>
+              <InputBox
+                name="Specific Place of Death"
+                id="death-specific-place"
+                type="text"
+                value={deathSpecificPlace}
+                setFunc={setDeathSpecificPlace}
+                fieldErrors={fieldErrors.deathSpecificPlace}
+              />
             </div>
           </>
         )}
