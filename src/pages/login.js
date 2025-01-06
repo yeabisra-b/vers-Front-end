@@ -4,11 +4,13 @@ import Image from "next/image";
 
 import eyePasswordShow from "../../public/images/eye-password-show.svg";
 import eyePasswordHide from "../../public/images/eye-password-hide.svg";
+//components
+import LogInInputField from "@/components/LogInComponents";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false); 
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
   const mockUsers = [
@@ -37,6 +39,11 @@ export default function LoginPage() {
       setError("Invalid username or password. Please try again.");
     }
   };
+  const handleChange = (e) => {
+    const { name, value } = e.target; // Destructure the event object
+    if (name === "Username") setUsername(value);
+    else if (name === "Password") setPassword(value);
+  };
 
   return (
     <>
@@ -48,52 +55,21 @@ export default function LoginPage() {
           onSubmit={handleLogin}
           className="w-full max-w-sm space-y-6 p-6 rounded-lg shadow-lg bg-white"
         >
-          <div>
-            <label
-              htmlFor="username"
-              className="block text-xl text-gray-800 font-semibold"
-            >
-              Username
-            </label>
-            <input
-              type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full p-3 mt-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
-              required
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-xl text-gray-800 font-semibold"
-            >
-              Password
-            </label>
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-3 mt-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-3 flex items-center"
-              >
-                <Image
-                  src={showPassword ? eyePasswordShow : eyePasswordHide}
-                  alt="Toggle Password Visibility"
-                  width={24}
-                  height={24}
-                />
-              </button>
-            </div>
-          </div>
+          {/*from this we can make a component that take a parameter {name, type, id, value, onchange function} */}
+          <LogInInputField
+            name={"Username"}
+            type={"text"}
+            id={"username"}
+            value={username}
+            setFunc={setUsername}
+          />
+          <LogInInputField
+            name={"Password"}
+            type={"password"}
+            id={"password"}
+            value={password}
+            setFunc={setPassword}
+          />
           {error && <div className="text-red-500 text-sm">{error}</div>}
           <button
             type="submit"
