@@ -39,12 +39,6 @@ export default function LoginPage() {
       setError("Invalid username or password. Please try again.");
     }
   };
-  const handleChange = (e) => {
-    const { name, value } = e.target; // Destructure the event object
-    if (name === "Username") setUsername(value);
-    else if (name === "Password") setPassword(value);
-  };
-
   return (
     <>
       <div className="flex flex-col items-center justify-center min-h-screen p-8 bg-blue-600">
