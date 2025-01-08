@@ -12,7 +12,12 @@ export default function AddUserPage() {
     confirmPassword: "",
   });
 
+
+  const NEXT_PUBLIC_API_URL = "http://localhost:8080";
+
   const [passwordError, setPasswordError] = useState("");
+  const [message, setMessage] = useState("");
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,33 +25,46 @@ export default function AddUserPage() {
       ...formData,
       [name]: value,
     });
-
-    // Password validation
-    if (name === "confirmPassword" || name === "password") {
-      if (
-        formData.password !== "" &&
-        name === "confirmPassword" &&
-        value !== formData.password
-      ) {
-        setPasswordError("Passwords do not match.");
-      } else {
-        setPasswordError("");
-      }
-    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage("");
 
-    // Final password validation before submission
+    // Password validation
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match.");
-      return;
+      setPasswordError("Passwords do not match.");
+      return; // Prevent form submission
+    } else {
+      setPasswordError("");
     }
 
+    const data = {
+      username: formData.username,
+      password: formData.password,
+      email: formData.email,
+      role: formData.role.toUpperCase(),
+    };
+
     // Perform the API call or logic to add the user
-    console.log("User Data Submitted:", formData);
-    alert("User has been successfully added.");
+    try {
+      const response = await fetch(NEXT_PUBLIC_API_URL + "/admin/add-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const responseData = await response.json();
+      if (response.ok) {
+        setMessage(responseData.message);
+      } else {
+        setMessage("Error: " + (responseData.error || "Unknown error has occured!"));
+      }
+    } catch (err) {
+      setMessage("Error: Failed to connect to the server.");
+    }
 
     // Clear the form
     setFormData({
@@ -149,6 +167,7 @@ export default function AddUserPage() {
             Add User
           </button>
         </form>
+        {message && <p className="mt-4 text-center">{message}</p>}
       </div>
     </div>
   );

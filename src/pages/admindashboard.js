@@ -1,6 +1,63 @@
 import Link from "next/link";
+import { useState } from "react";
 
-export default function OfficialDashboardPage() {
+export default function AdminDashboardPage() {
+  
+  const NEXT_PUBLIC_API_URL = "http://localhost:8080";
+
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState("REGISTRAR");
+  const [removeUsername, setRemoveUsername] = useState("");
+  const [message, setMessage] = useState("");
+
+  const addUser = async () => {
+    try {
+      const response = await fetch(NEXT_PUBLIC_API_URL + "/admin/add-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username, password, email, role,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setMessage(data.message || "User added successfully.");
+      } else {
+        setMessage(data.error || "Failed to add user.");
+      }
+    } catch (error) {
+      setMessage("An error occured while adding user." + error);
+    }
+  };
+
+  const removeUser = async () => {
+    try {
+      const response = await fetch(NEXT_PUBLIC_API_URL + "/admin/remove-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+                body: JSON.stringify({ username: removeUsername
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setMessage(data.message || "User removed successfully.");
+      } else {
+        setMessage(data.error || "Failed to remove user.");
+      }
+    } catch (error) {
+      setMessage("An error occured while removing user." + error);
+    }
+
+  };
+
   return (
     <div className="flex h-screen">
       {/* Sidebar */}

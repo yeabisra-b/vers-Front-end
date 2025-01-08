@@ -7,38 +7,64 @@ import eyePasswordHide from "../../public/images/eye-password-hide.svg";
 //components
 import LogInInputField from "@/components/LogInComponents";
 
+
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const mockUsers = [
-    { username: "adminUser", password: "adminPass", role: "ADMIN" },
-    { username: "registrarUser", password: "registrarPass", role: "REGISTRAR" },
-    { username: "officialUser", password: "officialPass", role: "OFFICIAL" },
-  ];
-
+  const NEXT_PUBLIC_API_URL = "http://localhost:8080";
+  
   const roleDashboardMap = {
-    ADMIN: "/admindashboard",
-    REGISTRAR: "/registrardashboard",
-    OFFICIAL: "/officialdashboard",
+    "ADMIN": "/admindashboard",
+    "REGISTRAR": "/registrardashboard",
+    "OFFICIAL": "/officialdashboard",
   };
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    const user = mockUsers.find(
-      (u) =>
-        u.username.toLowerCase() === username.toLowerCase() &&
-        u.password === password
-    );
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setError("");
+    setLoading(true);
 
-    if (user) {
-      window.location.href = roleDashboardMap[user.role];
-    } else {
-      setError("Invalid username or password. Please try again.");
+    try {
+      const response = await fetch(NEXT_PUBLIC_API_URL + "/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      setLoading(false);
+
+      if (response.ok) {
+        const data = await response.json();
+        const dashboardPage = roleDashboardMap[data.role];
+
+        if (dashboardPage) {
+          window.location.href = dashboardPage;
+        }
+        else {
+          setError("Invalid role or no dashboard available!");
+        }
+      }
+      else {
+        const errorData = await response.json();
+        setError(errorData.error || "An unknown error has occured!");
+      }
     }
+<<<<<<< HEAD
   };
+=======
+    catch (error) {
+      setLoading(false);
+      setError("Failed to connect to the server. Please try again." + error);
+    }
+  }
+
+>>>>>>> 2482df1 (Initial commit for a branch)
   return (
     <>
       <div className="flex flex-col items-center justify-center min-h-screen p-8 bg-blue-600">
@@ -46,7 +72,7 @@ export default function LoginPage() {
           Vital Events Registering System
         </h1>
         <form
-          onSubmit={handleLogin}
+          onSubmit={handleSubmit}
           className="w-full max-w-sm space-y-6 p-6 rounded-lg shadow-lg bg-white"
         >
           {/*from this we can make a component that take a parameter {name, type, id, value, onchange function} */}
@@ -67,12 +93,14 @@ export default function LoginPage() {
           {error && <div className="text-red-500 text-sm">{error}</div>}
           <button
             type="submit"
+            disabled={loading}
             className="w-full p-3 mt-6 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition duration-300"
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
       </div>
+<<<<<<< HEAD
       <div className="mt-4 flex justify-center">
         <Link
           href="/about"
@@ -81,6 +109,8 @@ export default function LoginPage() {
           Go to About Page
         </Link>
       </div>
+=======
+>>>>>>> 2482df1 (Initial commit for a branch)
     </>
   );
 }

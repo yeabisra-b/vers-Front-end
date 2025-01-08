@@ -1,5 +1,6 @@
 import InputBox from "@/components/InputBox";
 import { useState } from "react";
+<<<<<<< HEAD
 
 export default function TempPage() {
   const [eventType, setEventType] = useState("birth");
@@ -223,21 +224,176 @@ export default function TempPage() {
             htmlFor="event-type"
             className="block text-xl font-semibold text-gray-800"
           >
+=======
+
+export default function RegisterEventPage() {
+  const NEXT_PUBLIC_API_URL = "http://localhost:8080";
+
+  const [formData, setFormData] = useState({
+    type: "",
+    childName: { firstName: "", middleName: "", lastName: "" },
+    dateOfBirth: "",
+    fatherName: { firstName: "", middleName: "", lastName: "" },
+    motherName: { firstName: "", middleName: "", lastName: "" },
+    birthWeight: "",
+    deceasedName: { firstName: "", middleName: "", lastName: "" },
+    dateOfDeath: "",
+    causeOfDeath: "",
+    certifierName: { firstName: "", middleName: "", lastName: "" },
+    maleSpouseName: { firstName: "", middleName: "", lastName: "" },
+    femaleSpouseName: { firstName: "", middleName: "", lastName: "" },
+    witnessOneName: { firstName: "", middleName: "", lastName: "" },
+    witnessTwoName: { firstName: "", middleName: "", lastName: "" },
+    courtName: "",
+    dateOfMarriage: "",
+    dateOfDivorce: "",
+    dateOfRegistration: "",
+    location: {
+      region: "",
+      zone: "",
+      woreda: "",
+    },
+    registrar: {
+      username: "",
+      role: "REGISTRAR",
+    },
+    status: "PENDING",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name.includes("location.")) {
+      const locationField = name.split(".")[1];
+      setFormData((prev) => ({
+        ...prev,
+        location: {
+          ...prev.location,
+          [locationField]: value,
+        },
+      }));
+    } else if (name.includes("registrar.")) {
+      const registrarField = name.split(".")[1];
+      setFormData((prev) => ({
+        ...prev,
+        registrar: {
+          ...prev.registrar,
+          [registrarField]: value,
+        },
+      }));
+    } else if (name.includes("Name.")) {
+      const [field, subField] = name.split(".");
+      setFormData((prev) => ({
+        ...prev,
+        [field]: {
+          ...prev[field],
+          [subField]: value,
+        },
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Concatenate name fields before sending
+    const formattedData = {
+      ...formData,
+      childName: `${formData.childName.firstName} ${formData.childName.middleName} ${formData.childName.lastName}`.trim(),
+      fatherName: `${formData.fatherName.firstName} ${formData.fatherName.middleName} ${formData.fatherName.lastName}`.trim(),
+      motherName: `${formData.motherName.firstName} ${formData.motherName.middleName} ${formData.motherName.lastName}`.trim(),
+      deceasedName: `${formData.deceasedName.firstName} ${formData.deceasedName.middleName} ${formData.deceasedName.lastName}`.trim(),
+      certifierName: `${formData.certifierName.firstName} ${formData.certifierName.middleName} ${formData.certifierName.lastName}`.trim(),
+      maleSpouseName: `${formData.maleSpouseName.firstName} ${formData.maleSpouseName.middleName} ${formData.maleSpouseName.lastName}`.trim(),
+      femaleSpouseName: `${formData.femaleSpouseName.firstName} ${formData.femaleSpouseName.middleName} ${formData.femaleSpouseName.lastName}`.trim(),
+      witnessOneName: `${formData.witnessOneName.firstName} ${formData.witnessOneName.middleName} ${formData.witnessOneName.lastName}`.trim(),
+      witnessTwoName: `${formData.witnessTwoName.firstName} ${formData.witnessTwoName.middleName} ${formData.witnessTwoName.lastName}`.trim(),
+    };
+
+    try {
+      const response = await fetch(`${NEXT_PUBLIC_API_URL}/registrar/register-event`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formattedData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.error}`);
+        return;
+      }
+
+      const successData = await response.json();
+      alert(successData.message);
+
+      // Reset form
+      setFormData({
+        type: "",
+        childName: { firstName: "", middleName: "", lastName: "" },
+        dateOfBirth: "",
+        fatherName: { firstName: "", middleName: "", lastName: "" },
+        motherName: { firstName: "", middleName: "", lastName: "" },
+        birthWeight: "",
+        deceasedName: { firstName: "", middleName: "", lastName: "" },
+        dateOfDeath: "",
+        causeOfDeath: "",
+        certifierName: { firstName: "", middleName: "", lastName: "" },
+        maleSpouseName: { firstName: "", middleName: "", lastName: "" },
+        femaleSpouseName: { firstName: "", middleName: "", lastName: "" },
+        witnessOneName: { firstName: "", middleName: "", lastName: "" },
+        witnessTwoName: { firstName: "", middleName: "", lastName: "" },
+        courtName: "",
+        dateOfMarriage: "",
+        dateOfDivorce: "",
+        dateOfRegistration: "",
+        location: {
+          region: "",
+          zone: "",
+          woreda: "",
+        },
+        registrar: {
+          username: "",
+          role: "REGISTRAR",
+        },
+        status: "PENDING",
+      });
+    } catch (error) {
+      alert("Failed to connect to the server. Please try again.");
+    }
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded">
+      <h1 className="text-2xl font-bold mb-4">Register Event</h1>
+      <form onSubmit={handleSubmit}>
+        <div className="mb-4">
+          <label className="block text-gray-700 font-bold mb-2" htmlFor="type">
+>>>>>>> 2482df1 (Initial commit for a branch)
             Event Type
           </label>
           <select
-            id="event-type"
-            value={eventType}
-            onChange={(e) => setEventType(e.target.value)}
-            className="w-full p-3 mt-2 border rounded-lg focus:ring-2 focus:ring-green-500 text-black"
+            id="type"
+            name="type"
+            value={formData.type}
+            onChange={handleChange}
+            className="w-full p-2 border border-gray-300 rounded"
           >
-            <option value="birth">Birth</option>
-            <option value="death">Death</option>
-            <option value="marriage">Marriage</option>
-            <option value="divorce">Divorce</option>
+            <option value="">Select Event Type</option>
+            <option value="BIRTH">Birth</option>
+            <option value="DEATH">Death</option>
+            <option value="MARRIAGE">Marriage</option>
+            <option value="DIVORCE">Divorce</option>
           </select>
         </div>
 
+<<<<<<< HEAD
         {/* Birth Form */}
         {eventType === "birth" && (
           <>
@@ -1042,15 +1198,418 @@ export default function TempPage() {
               </div>
             </div>
           </>
+=======
+        {formData.type === "BIRTH" && (
+          <div className="mb-4">
+            <label className="block text-gray-700 font-bold mb-2">Child Name</label>
+            <input
+              type="text"
+              placeholder="First Name"
+              name="childName.firstName"
+              value={formData.childName.firstName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Middle Name"
+              name="childName.middleName"
+              value={formData.childName.middleName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              name="childName.lastName"
+              value={formData.childName.lastName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <label className="block text-gray-700 font-bold mb-2">Father Name</label>
+            <input
+              type="text"
+              placeholder="First Name"
+              name="fatherName.firstName"
+              value={formData.fatherName.firstName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Middle Name"
+              name="fatherName.middleName"
+              value={formData.fatherName.middleName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              name="fatherName.lastName"
+              value={formData.fatherName.lastName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <label className="block text-gray-700 font-bold mb-2">Mother Name</label>
+            <input
+              type="text"
+              placeholder="First Name"
+              name="motherName.firstName"
+              value={formData.motherName.firstName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Middle Name"
+              name="motherName.middleName"
+              value={formData.motherName.middleName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              name="childName.lastName"
+              value={formData.motherName.lastName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+            <label className="block text-gray-700 font-bold mb-2 mt-4">Date of Birth</label>
+            <input
+              type="date"
+              name="dateOfBirth"
+              value={formData.dateOfBirth}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+            <label className="block text-gray-700 font-bold mb-2">Birth Weight</label>
+            <input
+              type="number"
+              name="birthWeight"
+              value={formData.birthWeight}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+          </div>
+        )}
+
+        {formData.type === "DEATH" && (
+          <div className="mb-4">
+            <label className="block text-gray-700 font-bold mb-2">Deceased Name</label>
+            <input
+              type="text"
+              placeholder="First Name"
+              name="deceasedName.firstName"
+              value={formData.deceasedName.firstName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Middle Name"
+              name="deceasedName.middleName"
+              value={formData.deceasedName.middleName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              name="deceasedName.lastName"
+              value={formData.deceasedName.lastName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+            <label className="block text-gray-700 font-bold mb-2 mt-4">Date of Death</label>
+            <input
+              type="date"
+              name="dateOfDeath"
+              value={formData.dateOfDeath}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+            <label className="block text-gray-700 font-bold mb-2 mt-4">Cause of Death</label>
+            <input
+              type="text"
+              name="causeOfDeath"
+              value={formData.causeOfDeath}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+            <label className="block text-gray-700 font-bold mb-2">Certifier Name</label>
+            <input
+              type="text"
+              placeholder="First Name"
+              name="certifierName.firstName"
+              value={formData.certifierName.firstName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Middle Name"
+              name="certifierName.middleName"
+              value={formData.certifierName.middleName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              name="certifierName.lastName"
+              value={formData.certifierName.lastName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+          </div>
+        )}
+
+        {formData.type === "MARRIAGE" && (
+          <div className="mb-4">
+            <label className="block text-gray-700 font-bold mb-2">Male Spouse Name</label>
+            <input
+              type="text"
+              placeholder="First Name"
+              name="maleSpouseName.firstName"
+              value={formData.maleSpouseName.firstName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Middle Name"
+              name="maleSpouseName.middleName"
+              value={formData.maleSpouseName.middleName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              name="maleSpouseName.lastName"
+              value={formData.maleSpouseName.lastName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+            <label className="block text-gray-700 font-bold mb-2 mt-4">Female Spouse Name</label>
+            <input
+              type="text"
+              placeholder="First Name"
+              name="femaleSpouseName.firstName"
+              value={formData.femaleSpouseName.firstName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Middle Name"
+              name="femaleSpouseName.middleName"
+              value={formData.femaleSpouseName.middleName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              name="femaleSpouseName.lastName"
+              value={formData.femaleSpouseName.lastName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+            <label className="block text-gray-700 font-bold mb-2 mt-4">Date of Marriage</label>
+            <input
+              type="date"
+              name="dateOfMarriage"
+              value={formData.dateOfMarriage}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+            <label className="block text-gray-700 font-bold mb-2 mt-4">First Witness Name</label>
+            <input
+              type="text"
+              placeholder="First Name"
+              name="witnessOneName.firstName"
+              value={formData.witnessOneName.firstName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Middle Name"
+              name="witnessOneName.middleName"
+              value={formData.witnessOneName.middleName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              name="witnessOneName.lastName"
+              value={formData.witnessOneName.lastName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+            <label className="block text-gray-700 font-bold mb-2 mt-4">Second Witness Name</label>
+            <input
+              type="text"
+              placeholder="First Name"
+              name="witnessTwoName.firstName"
+              value={formData.witnessTwoName.firstName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Middle Name"
+              name="witnessTwoName.middleName"
+              value={formData.witnessTwoName.middleName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              name="witnessTwoName.lastName"
+              value={formData.witnessTwoName.lastName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+            <label className="block text-gray-700 font-bold mb-2 mt-4">Certifier Name</label>
+            <input
+              type="text"
+              placeholder="First Name"
+              name="certifierName.firstName"
+              value={formData.certifierName.firstName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Middle Name"
+              name="certifierName.middleName"
+              value={formData.certifierName.middleName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              name="certifierName.lastName"
+              value={formData.certifierName.lastName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+
+          </div>
+        )}
+
+        {formData.type === "DIVORCE" && (
+          <div className="mb-4">
+            <label className="block text-gray-700 font-bold mb-2">Male Spouse Name</label>
+            <input
+              type="text"
+              placeholder="First Name"
+              name="maleSpouseName.firstName"
+              value={formData.maleSpouseName.firstName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Middle Name"
+              name="maleSpouseName.middleName"
+              value={formData.maleSpouseName.middleName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              name="maleSpouseName.lastName"
+              value={formData.maleSpouseName.lastName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+            <label className="block text-gray-700 font-bold mb-2 mt-4">Female Spouse Name</label>
+            <input
+              type="text"
+              placeholder="First Name"
+              name="femaleSpouseName.firstName"
+              value={formData.femaleSpouseName.firstName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Middle Name"
+              name="femaleSpouseName.middleName"
+              value={formData.femaleSpouseName.middleName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              name="femaleSpouseName.lastName"
+              value={formData.femaleSpouseName.lastName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+            <label className="block text-gray-700 font-bold mb-2 mt-4">Certifier Name</label>
+            <input
+              type="text"
+              placeholder="First Name"
+              name="certifierName.firstName"
+              value={formData.certifierName.firstName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Middle Name"
+              name="certifierName.middleName"
+              value={formData.certifierName.middleName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              name="certifierName.lastName"
+              value={formData.certifierName.lastName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+            <label className="block text-gray-700 font-bold mb-2">Court Name</label>
+            <input
+              type="text"
+              name="courtName"
+              value={formData.courtName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+            <label className="block text-gray-700 font-bold mb-2 mt-4">Date of Divorce</label>
+            <input
+              type="date"
+              name="dateOfDivorce"
+              value={formData.dateOfDivorce}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+          </div>
+>>>>>>> 2482df1 (Initial commit for a branch)
         )}
 
         <button
           type="submit"
-          className="w-full p-3 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition duration-300"
+          className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600"
         >
-          Register Event
+          Submit
         </button>
       </form>
     </div>
   );
 }
+
