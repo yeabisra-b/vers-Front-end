@@ -1,12 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function SearchRemoveUserPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [users, setUsers] = useState([
-    { id: 1, username: "john_doe", email: "john@example.com", role: "registrar" },
-    { id: 2, username: "jane_smith", email: "jane@example.com", role: "official" },
-  ]);
-  const [filteredUsers, setFilteredUsers] = useState(users);
+  const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+
+  // Load users from localStorage on component mount
+  useEffect(() => {
+    const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
+    setUsers(storedUsers);
+    setFilteredUsers(storedUsers);
+  }, []);
 
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
@@ -18,12 +22,17 @@ export default function SearchRemoveUserPage() {
     );
   };
 
-  const handleRemove = (id) => {
-    if (window.confirm("Are you sure you want to remove this user?")) {
-      const updatedUsers = users.filter((user) => user.id !== id);
+  const handleRemove = (username) => {
+    if (window.confirm(`Are you sure you want to remove ${username}?`)) {
+      // Remove the user by username
+      const updatedUsers = users.filter((user) => user.username !== username);
+
+      // Update state and localStorage
       setUsers(updatedUsers);
       setFilteredUsers(updatedUsers);
-      alert("User has been successfully removed.");
+      localStorage.setItem("users", JSON.stringify(updatedUsers));
+
+      alert(`${username} has been successfully removed.`);
     }
   };
 
@@ -36,14 +45,14 @@ export default function SearchRemoveUserPage() {
 
         {/* Search Input */}
         <div className="mb-6">
-          <label className="block text-gray-700 font-medium mb-2">
+          <label className="block text-gray-900 font-medium mb-2">
             Search by Username
           </label>
           <input
             type="text"
             value={searchTerm}
             onChange={handleSearch}
-            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
+            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-500 text-gray-900"
             placeholder="Enter username"
           />
         </div>
@@ -64,7 +73,7 @@ export default function SearchRemoveUserPage() {
                   <p className="text-gray-500 text-sm">Role: {user.role}</p>
                 </div>
                 <button
-                  onClick={() => handleRemove(user.id)}
+                  onClick={() => handleRemove(user.username)}
                   className="py-2 px-4 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition duration-300"
                 >
                   Remove

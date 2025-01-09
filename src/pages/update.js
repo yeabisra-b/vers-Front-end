@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import InputField from "../components/InputField";
 import SelectField from "../components/SelectField";
 import SectionHeader from "../components/SectionHeader";
+import { Allerta } from "next/font/google";
 
 const UpdateEventPage = () => {
   // State definitions for search
   const [searchFirstName, setSearchFirstName] = useState(""); // For searching events
   const [searchEventType, setSearchEventType] = useState("birth"); // For searching by event type
   const [events, setEvents] = useState([]); // To store search results
+  const [filteredEvents, setFilteredEvents] = useState([]); // To store filtered events
   const [selectedEvent, setSelectedEvent] = useState(null); // Selected event for editing
 
   // Birth event details
@@ -43,67 +45,36 @@ const UpdateEventPage = () => {
 
   // Event type (e.g., "birth", "death", etc.)
   const [eventType, setEventType] = useState("birth");
-  // Handle search
-  const handleSearch = () => {
-    // Example search logic: Simulate API call to fetch events by first name and type
-    const mockResults = [
-      {
-        id: 1,
-        firstName: "John",
-        middleName: "Michael",
-        lastName: "Doe",
-        gender: "male",
-        motherFirstName: "Jane",
-        motherMiddleName: "Ann",
-        motherLastName: "Doe",
-        region: "Region 1",
-        zone: "Zone A",
-        woreda: "Woreda 3",
-        phoneNumber: "123-456-7890",
-        birthWeight: "3.5kg",
-        dateOfBirth: "2025-01-01",
-        eventType: "birth",
-      },
-      {
-        id: 2,
-        firstName: "Emily",
-        middleName: "Rose",
-        lastName: "Smith",
-        gender: "female",
-        causeOfDeath: "Heart Attack",
-        physicianFirstName: "Dr. Alan",
-        physicianMiddleName: "Patrick",
-        physicianLastName: "Johnson",
-        region: "Region 2",
-        zone: "Zone B",
-        woreda: "Woreda 5",
-        dateOfDeath: "2024-12-20",
-        eventType: "death",
-      },
-      {
-        id: 3,
-        firstName: "Robert",
-        middleName: "James",
-        lastName: "Brown",
-        gender: "male",
-        causeOfDeath: "Car Accident",
-        physicianFirstName: "Dr. Sarah",
-        physicianMiddleName: "Elizabeth",
-        physicianLastName: "Taylor",
-        region: "Region 3",
-        zone: "Zone C",
-        woreda: "Woreda 7",
-        dateOfDeath: "2023-06-15",
-        eventType: "death",
-      },
-    ].filter(
-      (event) =>
-        event.eventType === searchEventType &&
-        event.firstName.toLowerCase().includes(searchFirstName.toLowerCase())
+
+  useEffect(() => {
+    // Load from local storage
+    const savedEvents = JSON.parse(localStorage.getItem("events"));
+    const filtered = savedEvents.filter(
+      (event) => event.eventType === "birth" || event.eventType === "death"
     );
-  
-    setEvents(mockResults); // Set mock data as search results
-  };
+    if (filtered) {
+      setEvents(filtered);
+      setFilteredEvents(filtered);
+    }
+    console.log(filtered);
+  }, []);
+
+
+ // Handle search
+const handleSearch = () => {
+  // Filter events based on search criteria (first name and event type)
+  const allEvents = JSON.parse(localStorage.getItem("events"));
+  const filtered = allEvents.filter((event) => {
+    return (
+      event.firstName.toLowerCase().includes(searchFirstName.toLowerCase()) &&
+      event.eventType === searchEventType
+    );
+  });
+
+  console.log("Filtered Events:", filtered);
+
+  setFilteredEvents(filtered); // Update the filtered events
+};
 
   // Handle selecting an event
 const handleSelectEvent = (event) => {
@@ -141,42 +112,67 @@ const handleSelectEvent = (event) => {
       setDeathDateOfDeath(event.dateOfDeath);
     }
   };
-  // Handle updating the event
+
   const handleUpdate = () => {
-    if (eventType === "birth") {
-      console.log("Updated Birth Event:", {
-        firstName: birthFirstName,
-        middleName: birthMiddleName,
-        lastName: birthLastName,
-        gender: birthGender,
-        motherFirstName: birthMotherFirstName,
-        motherMiddleName: birthMotherMiddleName,
-        motherLastName: birthMotherLastName,
-        region: birthRegion,
-        zone: birthZone,
-        woreda: birthWoreda,
-        phoneNumber: birthPhoneNumber,
-        birthWeight: birthWeight,
-        dateOfBirth: birthDateOfBirth,
-      });
-    } else if (eventType === "death") {
-      console.log("Updated Death Event:", {
-        firstName: deathFirstName,
-        middleName: deathMiddleName,
-        lastName: deathLastName,
-        gender: deathGender,
-        causeOfDeath: deathCauseOfDeath,
-        physicianFirstName: deathPhysicianFirstName,
-        physicianMiddleName: deathPhysicianMiddleName,
-        physicianLastName: deathPhysicianLastName,
-        region: deathRegion,
-        zone: deathZone,
-        woreda: deathWoreda,
-        dateOfDeath: deathDateOfDeath,
-      });
+    if (selectedEvent) {
+      let updatedEvent;
+  
+      // Check if the selected event is a birth or death event
+      if (eventType === "birth") {
+        updatedEvent = {
+          ...selectedEvent,
+          firstName: birthFirstName,
+          middleName: birthMiddleName,
+          lastName: birthLastName,
+          gender: birthGender,
+          motherFirstName: birthMotherFirstName,
+          motherMiddleName: birthMotherMiddleName,
+          motherLastName: birthMotherLastName,
+          region: birthRegion,
+          zone: birthZone,
+          woreda: birthWoreda,
+          phoneNumber: birthPhoneNumber,
+          birthWeight: birthWeight,
+          dateOfBirth: birthDateOfBirth,
+          eventType: "birth", // Ensure the eventType stays as "birth"
+        };
+      } else if (eventType === "death") {
+        updatedEvent = {
+          ...selectedEvent,
+          firstName: deathFirstName,
+          middleName: deathMiddleName,
+          lastName: deathLastName,
+          gender: deathGender,
+          causeOfDeath: deathCauseOfDeath,
+          physicianFirstName: deathPhysicianFirstName,
+          physicianMiddleName: deathPhysicianMiddleName,
+          physicianLastName: deathPhysicianLastName,
+          region: deathRegion,
+          zone: deathZone,
+          woreda: deathWoreda,
+          dateOfDeath: deathDateOfDeath,
+          eventType: "death", // Ensure the eventType stays as "death"
+        };
+      }
+  
+      // Update the events array in state
+      const updatedEvents = events.map((event) =>
+        event.id === selectedEvent.id ? updatedEvent : event
+      );
+  
+      // Update the events in localStorage
+      localStorage.setItem("events", JSON.stringify(updatedEvents));
+      setSelectedEvent(null); // Clear the selected event
+      setFilteredEvents(updatedEvents); // Update the filtered events
+  
+      // Update the state with the updated events
+      setEvents(updatedEvents);
+  
+      // Show success message
+      alert("Event updated successfully!");
     }
-    alert("Event updated successfully!");
   };
+  
   
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -222,11 +218,11 @@ const handleSelectEvent = (event) => {
     </div>
 
       {/* Search Results */}
-      {events.length > 0 && (
+      {filteredEvents.length > 0 && (
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-black">Search Results</h2>
         <ul className="mt-2 space-y-2">
-          {events.map((event) => (
+          {filteredEvents.map((event) => (
             <li
               key={event.id}
               className="p-4 bg-white border rounded-lg shadow-sm cursor-pointer hover:bg-gray-50"
@@ -483,6 +479,7 @@ const handleSelectEvent = (event) => {
           </button>
         </>
       )}
+     
     </div>
   );
 };

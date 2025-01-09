@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react";
 import InputField from "../components/InputField";
-import SelectField from "../components/SelectField";
-import SectionHeader from "../components/SectionHeader";
 
-export default function ProfilePage({ user }) {
+export default function ProfilePage() {
   const [profileData, setProfileData] = useState({
     username: "",
     email: "",
-    role: "registrar", // Default role
+    role: "registrar",
   });
 
   const [passwordData, setPasswordData] = useState({
@@ -17,8 +15,15 @@ export default function ProfilePage({ user }) {
   });
 
   const [passwordError, setPasswordError] = useState("");
+  const [user, setUser] = useState(null);
 
+  // Load profile data from local storage
   useEffect(() => {
+    const loggedInUsername = localStorage.getItem("loggedin-username");
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const user = users.find((u) => u.username === loggedInUsername);
+    console.log(user);
+    setUser(user);
     if (user) {
       setProfileData({
         username: user.username || "",
@@ -26,7 +31,7 @@ export default function ProfilePage({ user }) {
         role: user.role || "registrar",
       });
     }
-  }, [user]);
+  }, []);
 
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
@@ -49,7 +54,21 @@ export default function ProfilePage({ user }) {
       setPasswordError("Passwords do not match.");
       return;
     }
-    console.log("Password Change Data:", passwordData);
+
+    console.log(user.password, passwordData.currentPassword);
+    if (passwordData.currentPassword !== user.password) {
+      setPasswordError("Invalid current password");
+      return;
+    }
+
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const updatedUsers = users.map((u) =>
+      u.username === profileData.username
+        ? { ...u, password: passwordData.newPassword }
+        : u
+    );
+
+    localStorage.setItem("users", JSON.stringify(updatedUsers));
     alert("Password changed successfully.");
     setPasswordData({
       currentPassword: "",
@@ -64,79 +83,54 @@ export default function ProfilePage({ user }) {
 
       {/* Personal Information */}
       <div className="mb-6">
-        <SectionHeader title="Personal Information" />
-        <div className="space-y-4">
-          <InputField
-            label="Username"
-            id="username"
-            value={profileData.username}
-            onChange={() => {}}
-            name="username"
-            required
-            disabled
-          />
-          <InputField
-            label="Email"
-            id="email"
-            value={profileData.email}
-            onChange={() => {}}
-            name="email"
-            type="email"
-            required
-            disabled
-          />
-          <SelectField
-            label="Role"
-            id="role"
-            value={profileData.role}
-            onChange={() => {}}
-            name="role"
-            options={[
-              { value: "registrar", label: "Registrar" },
-              { value: "official", label: "Official" },
-              { value: "admin", label: "Admin" },
-            ]}
-            disabled
-          />
-        </div>
+        <h2 className="text-xl font-semibold mb-4">Personal Information</h2>
+        <InputField
+          label="Username"
+          id="username"
+          value={profileData.username}
+          onChange={() => {}}
+          disabled
+        />
+        <InputField
+          label="Email"
+          id="email"
+          value={profileData.email}
+          onChange={() => {}}
+          disabled
+        />
       </div>
 
       {/* Password Change */}
       <div className="mb-6">
-        <SectionHeader title="Change Password" />
+        <h2 className="text-xl font-semibold mb-4">Change Password</h2>
         <form onSubmit={handlePasswordSubmit}>
-          <div className="space-y-4">
-            <InputField
-              label="Current Password"
-              id="current-password"
-              value={passwordData.currentPassword}
-              onChange={handlePasswordChange}
-              name="currentPassword"
-              type="password"
-              required
-            />
-            <InputField
-              label="New Password"
-              id="new-password"
-              value={passwordData.newPassword}
-              onChange={handlePasswordChange}
-              name="newPassword"
-              type="password"
-              required
-            />
-            <InputField
-              label="Confirm New Password"
-              id="confirm-password"
-              value={passwordData.confirmPassword}
-              onChange={handlePasswordChange}
-              name="confirmPassword"
-              type="password"
-              required
-            />
-            {passwordError && (
-              <p className="text-red-500 text-sm">{passwordError}</p>
-            )}
-          </div>
+          <InputField
+            label="Current Password"
+            id="current-password"
+            value={passwordData.currentPassword}
+            onChange={handlePasswordChange}
+            name="currentPassword"
+            type="password"
+          />
+          <InputField
+            label="New Password"
+            id="new-password"
+            value={passwordData.newPassword}
+            onChange={handlePasswordChange}
+            name="newPassword"
+            type="password"
+          />
+          <InputField
+            label="Confirm New Password"
+            id="confirm-password"
+            value={passwordData.confirmPassword}
+            onChange={handlePasswordChange}
+            name="confirmPassword"
+            type="password"
+          />
+          {passwordError && (
+            <p className="text-red-500 text-sm">{passwordError}</p>
+          )}
           <button
             type="submit"
             className="w-full p-3 mt-6 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition duration-300"

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import InputField from "../components/InputField";
 import SectionHeader from "../components/SectionHeader";
 
@@ -40,39 +40,23 @@ const UpdateMarriageDivorcePage = () => {
 
   const [eventType, setEventType] = useState("marriage");
 
+  // Fetch events from local storage
+  useEffect(() => {
+    const storedEvents = JSON.parse(localStorage.getItem("events")) || [];
+
+    // Filter events to include only 'marriage' or 'divorce'
+    const filteredEvents = storedEvents.filter(
+      (event) => event.eventType === "marriage" || event.eventType === "divorce"
+    );
+
+    console.log(filteredEvents);
+
+    setEvents(filteredEvents); // Set only marriage or divorce events
+  }, []);
+
   // Handle search
   const handleSearch = () => {
-    const mockResults = [
-      {
-        id: 1,
-        maleSpouseFirstName: "John",
-        maleSpouseMiddleName: "Michael",
-        maleSpouseLastName: "Doe",
-        femaleSpouseFirstName: "Jane",
-        femaleSpouseMiddleName: "Ann",
-        femaleSpouseLastName: "Doe",
-        witness1FirstName: "Tom",
-        witness1MiddleName: "William",
-        witness1LastName: "Smith",
-        witness2FirstName: "Lucy",
-        witness2MiddleName: "Marie",
-        witness2LastName: "Johnson",
-        date: "2025-01-01",
-        eventType: "marriage",
-      },
-      {
-        id: 2,
-        maleSpouseFirstName: "Robert",
-        maleSpouseMiddleName: "James",
-        maleSpouseLastName: "Brown",
-        femaleSpouseFirstName: "Emily",
-        femaleSpouseMiddleName: "Rose",
-        femaleSpouseLastName: "White",
-        courtName: "City Court",
-        date: "2024-12-20",
-        eventType: "divorce",
-      },
-    ].filter(
+    const searchResults = events.filter(
       (event) =>
         event.eventType === searchEventType &&
         (event.maleSpouseFirstName
@@ -82,8 +66,7 @@ const UpdateMarriageDivorcePage = () => {
             .toLowerCase()
             .includes(searchFirstName.toLowerCase()))
     );
-
-    setEvents(mockResults); // Set mock data as search results
+    setEvents(searchResults); // Set filtered events as search results
   };
 
   const handleSelectEvent = (event) => {
@@ -91,74 +74,94 @@ const UpdateMarriageDivorcePage = () => {
     setEventType(event.eventType);
 
     if (event.eventType === "marriage") {
-      setMarriageMaleFirstName(event.maleSpouseFirstName);
-      setMarriageMaleMiddleName(event.maleSpouseMiddleName);
-      setMarriageMaleLastName(event.maleSpouseLastName);
-      setMarriageFemaleFirstName(event.femaleSpouseFirstName);
-      setMarriageFemaleMiddleName(event.femaleSpouseMiddleName);
-      setMarriageFemaleLastName(event.femaleSpouseLastName);
-      setMarriageWitness1FirstName(event.witness1FirstName);
-      setMarriageWitness1MiddleName(event.witness1MiddleName);
-      setMarriageWitness1LastName(event.witness1LastName);
-      setMarriageWitness2FirstName(event.witness2FirstName);
-      setMarriageWitness2MiddleName(event.witness2MiddleName);
-      setMarriageWitness2LastName(event.witness2LastName);
-      setMarriageDate(event.date);
+      setMarriageMaleFirstName(event.maleSpouseName.firstName);
+      setMarriageMaleMiddleName(event.maleSpouseName.middleName);
+      setMarriageMaleLastName(event.maleSpouseName.lastName);
+      setMarriageFemaleFirstName(event.femaleSpouseName.firstName);
+      setMarriageFemaleMiddleName(event.femaleSpouseName.middleName);
+      setMarriageFemaleLastName(event.femaleSpouseName.lastName);
+      setMarriageWitness1FirstName(event.witnesses[0].firstName);
+      setMarriageWitness1MiddleName(event.witnesses[0].middleName);
+      setMarriageWitness1LastName(event.witnesses[0].lastName);
+      setMarriageWitness2FirstName(event.witnesses[1].firstName);
+      setMarriageWitness2MiddleName(event.witnesses[1].middleName);
+      setMarriageWitness2LastName(event.witnesses[1].lastName);
+      setMarriageDate(event.dateOfMarriage);
     } else if (event.eventType === "divorce") {
-      setDivorceMaleFirstName(event.maleSpouseFirstName);
-      setDivorceMaleMiddleName(event.maleSpouseMiddleName);
-      setDivorceMaleLastName(event.maleSpouseLastName);
-      setDivorceFemaleFirstName(event.femaleSpouseFirstName);
-      setDivorceFemaleMiddleName(event.femaleSpouseMiddleName);
-      setDivorceFemaleLastName(event.femaleSpouseLastName);
+      setDivorceMaleFirstName(event.maleSpouseName.firstName);
+      setDivorceMaleMiddleName(event.maleSpouseName.middleName);
+      setDivorceMaleLastName(event.maleSpouseName.lastName);
+      setDivorceFemaleFirstName(event.femaleSpouseName.firstName);
+      setDivorceFemaleMiddleName(event.femaleSpouseName.middleName);
+      setDivorceFemaleLastName(event.femaleSpouseName.lastName);
       setDivorceCourtName(event.courtName);
-      setDivorceDate(event.date);
+      setDivorceDate(event.dateOfDivorce);
     }
   };
 
   const handleUpdate = () => {
+    let updatedEvents = [...events];
+    
     if (eventType === "marriage") {
-      console.log("Updated Marriage Event:", {
-        maleSpouse: {
-          firstName: marriageMaleFirstName,
-          middleName: marriageMaleMiddleName,
-          lastName: marriageMaleLastName,
-        },
-        femaleSpouse: {
-          firstName: marriageFemaleFirstName,
-          middleName: marriageFemaleMiddleName,
-          lastName: marriageFemaleLastName,
-        },
-        witness1: {
-          firstName: marriageWitness1FirstName,
-          middleName: marriageWitness1MiddleName,
-          lastName: marriageWitness1LastName,
-        },
-        witness2: {
-          firstName: marriageWitness2FirstName,
-          middleName: marriageWitness2MiddleName,
-          lastName: marriageWitness2LastName,
-        },
-        date: marriageDate,
-      });
+      updatedEvents = updatedEvents.map((event) =>
+        event.id === selectedEvent.id
+          ? {
+              ...event,
+              maleSpouseName: {
+                firstName: marriageMaleFirstName,
+                middleName: marriageMaleMiddleName,
+                lastName: marriageMaleLastName,
+              },
+              femaleSpouseName: {
+                firstName: marriageFemaleFirstName,
+                middleName: marriageFemaleMiddleName,
+                lastName: marriageFemaleLastName,
+              },
+              witnesses: [
+                {
+                  firstName: marriageWitness1FirstName,
+                  middleName: marriageWitness1MiddleName,
+                  lastName: marriageWitness1LastName,
+                },
+                {
+                  firstName: marriageWitness2FirstName,
+                  middleName: marriageWitness2MiddleName,
+                  lastName: marriageWitness2LastName,
+                },
+              ],
+              dateOfMarriage: marriageDate,
+              eventType: "marriage",
+            }
+          : event
+      );
     } else if (eventType === "divorce") {
-      console.log("Updated Divorce Event:", {
-        maleSpouse: {
-          firstName: divorceMaleFirstName,
-          middleName: divorceMaleMiddleName,
-          lastName: divorceMaleLastName,
-        },
-        femaleSpouse: {
-          firstName: divorceFemaleFirstName,
-          middleName: divorceFemaleMiddleName,
-          lastName: divorceFemaleLastName,
-        },
-        courtName: divorceCourtName,
-        date: divorceDate,
-      });
+      updatedEvents = updatedEvents.map((event) =>
+        event.id === selectedEvent.id
+          ? {
+              ...event,
+              maleSpouseName: {
+                firstName: divorceMaleFirstName,
+                middleName: divorceMaleMiddleName,
+                lastName: divorceMaleLastName,
+              },
+              femaleSpouseName: {
+                firstName: divorceFemaleFirstName,
+                middleName: divorceFemaleMiddleName,
+                lastName: divorceFemaleLastName,
+              },
+              courtName: divorceCourtName,
+              dateOfDivorce: divorceDate,
+              eventType: "divorce",
+            }
+          : event
+      );
     }
+    
+    setEvents(updatedEvents);
+    localStorage.setItem("events", JSON.stringify(updatedEvents)); // Save updated events back to local storage
     alert("Event updated successfully!");
   };
+  
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -208,11 +211,20 @@ const UpdateMarriageDivorcePage = () => {
                 className="p-4 bg-white border rounded-lg shadow-sm cursor-pointer hover:bg-gray-50"
                 onClick={() => handleSelectEvent(event)}
               >
-                <p className="text-lg font-medium text-black">
-                  {event.maleSpouseFirstName} {event.maleSpouseMiddleName}{" "}
-                  {event.maleSpouseLastName} & {event.femaleSpouseFirstName}{" "}
-                  {event.femaleSpouseMiddleName} {event.femaleSpouseLastName}
-                </p>
+                {event.eventType === "marriage" ? (
+                    <p className="text-lg font-medium text-black">
+                      {event.maleSpouseName.firstName} {event.maleSpouseName.middleName}{" "}
+                      {event.maleSpouseName.lastName} & {event.femaleSpouseName.firstName}{" "}
+                      {event.femaleSpouseName.middleName} {event.femaleSpouseName.lastName}
+                    </p>
+                ) : (
+                    <p className="text-lg font-medium text-black">
+                      {event.maleSpouseName.firstName} {event.maleSpouseName.middleName}{" "}
+                      {event.maleSpouseName.lastName} & {event.femaleSpouseName.firstName}{" "}
+                      {event.femaleSpouseName.middleName} {event.femaleSpouseName.lastName}
+                    </p>
+                )}
+
                 <p className="text-gray-700">Event Type: {event.eventType}</p>
               </li>
             ))}
@@ -220,169 +232,132 @@ const UpdateMarriageDivorcePage = () => {
         </div>
       )}
 
-      {/* Marriage Details */}
-      {selectedEvent && eventType === "marriage" && (
-        <>
-          <SectionHeader title="Marriage Details" />
-
-          <div className="grid grid-cols-3 gap-4">
-            <InputField
-              label="Male Spouse First Name"
-              value={marriageMaleFirstName}
-              onChange={(e) => setMarriageMaleFirstName(e.target.value)}
-            />
-            <InputField
-              label="Male Spouse Middle Name"
-              value={marriageMaleMiddleName}
-              onChange={(e) => setMarriageMaleMiddleName(e.target.value)}
-            />
-            <InputField
-              label="Male Spouse Last Name"
-              value={marriageMaleLastName}
-              onChange={(e) => setMarriageMaleLastName(e.target.value)}
-            />
-          </div>
-
-          <div className="grid grid-cols-3 gap-4 mt-4">
-            <InputField
-              label="Female Spouse First Name"
-              value={marriageFemaleFirstName}
-              onChange={(e) => setMarriageFemaleFirstName(e.target.value)}
-            />
-            <InputField
-              label="Female Spouse Middle Name"
-              value={marriageFemaleMiddleName}
-              onChange={(e) => setMarriageFemaleMiddleName(e.target.value)}
-            />
-            <InputField
-              label="Female Spouse Last Name"
-              value={marriageFemaleLastName}
-              onChange={(e) => setMarriageFemaleLastName(e.target.value)}
-            />
-          </div>
-
-          <SectionHeader title="Witnesses" />
-          <div className="grid grid-cols-3 gap-4 mt-4">
-            <InputField
-              label="Witness 1 First Name"
-              value={marriageWitness1FirstName}
-              onChange={(e) => setMarriageWitness1FirstName(e.target.value)}
-            />
-            <InputField
-              label="Witness 1 Middle Name"
-              value={marriageWitness1MiddleName}
-              onChange={(e) => setMarriageWitness1MiddleName(e.target.value)}
-            />
-            <InputField
-              label="Witness 1 Last Name"
-              value={marriageWitness1LastName}
-              onChange={(e) => setMarriageWitness1LastName(e.target.value)}
-            />
-          </div>
-
-          <div className="grid grid-cols-3 gap-4 mt-4">
-            <InputField
-              label="Witness 2 First Name"
-              value={marriageWitness2FirstName}
-              onChange={(e) => setMarriageWitness2FirstName(e.target.value)}
-            />
-            <InputField
-              label="Witness 2 Middle Name"
-              value={marriageWitness2MiddleName}
-              onChange={(e) => setMarriageWitness2MiddleName(e.target.value)}
-            />
-            <InputField
-              label="Witness 2 Last Name"
-              value={marriageWitness2LastName}
-              onChange={(e) => setMarriageWitness2LastName(e.target.value)}
-            />
-          </div>
-
-          <InputField
-            label="Date of Marriage"
-            type="date"
-            value={marriageDate}
-            onChange={(e) => setMarriageDate(e.target.value)}
-          />
-
+      {/* Event Details */}
+      {selectedEvent && (
+        <div>
+          <SectionHeader title="Event Details" />
+          <form className="space-y-6">
+            {eventType === "marriage" && (
+              <div>
+                <InputField
+                  label="Male First Name"
+                  value={marriageMaleFirstName}
+                  onChange={(e) => setMarriageMaleFirstName(e.target.value)}
+                />
+                <InputField
+                  label="Male Middle Name"
+                  value={marriageMaleMiddleName}
+                  onChange={(e) => setMarriageMaleMiddleName(e.target.value)}
+                />
+                <InputField
+                  label="Male Last Name"
+                  value={marriageMaleLastName}
+                  onChange={(e) => setMarriageMaleLastName(e.target.value)}
+                />
+                <InputField
+                  label="Female First Name"
+                  value={marriageFemaleFirstName}
+                  onChange={(e) => setMarriageFemaleFirstName(e.target.value)}
+                />
+                <InputField
+                  label="Female Middle Name"
+                  value={marriageFemaleMiddleName}
+                  onChange={(e) => setMarriageFemaleMiddleName(e.target.value)}
+                />
+                <InputField
+                  label="Female Last Name"
+                  value={marriageFemaleLastName}
+                  onChange={(e) => setMarriageFemaleLastName(e.target.value)}
+                />
+                <InputField
+                  label="Witness 1 First Name"
+                  value={marriageWitness1FirstName}
+                  onChange={(e) => setMarriageWitness1FirstName(e.target.value)}
+                />
+                <InputField
+                  label="Witness 1 Middle Name"
+                  value={marriageWitness1MiddleName}
+                  onChange={(e) => setMarriageWitness1MiddleName(e.target.value)}
+                />
+                <InputField
+                  label="Witness 1 Last Name"
+                  value={marriageWitness1LastName}
+                  onChange={(e) => setMarriageWitness1LastName(e.target.value)}
+                />
+                <InputField
+                  label="Witness 2 First Name"
+                  value={marriageWitness2FirstName}
+                  onChange={(e) => setMarriageWitness2FirstName(e.target.value)}
+                />
+                <InputField
+                  label="Witness 2 Middle Name"
+                  value={marriageWitness2MiddleName}
+                  onChange={(e) => setMarriageWitness2MiddleName(e.target.value)}
+                />
+                <InputField
+                  label="Witness 2 Last Name"
+                  value={marriageWitness2LastName}
+                  onChange={(e) => setMarriageWitness2LastName(e.target.value)}
+                />
+                <InputField
+                  label="Marriage Date"
+                  value={marriageDate}
+                  onChange={(e) => setMarriageDate(e.target.value)}
+                />
+              </div>
+            )}
+            {eventType === "divorce" && (
+              <div>
+                <InputField
+                  label="Male First Name"
+                  value={divorceMaleFirstName}
+                  onChange={(e) => setDivorceMaleFirstName(e.target.value)}
+                />
+                <InputField
+                  label="Male Middle Name"
+                  value={divorceMaleMiddleName}
+                  onChange={(e) => setDivorceMaleMiddleName(e.target.value)}
+                />
+                <InputField
+                  label="Male Last Name"
+                  value={divorceMaleLastName}
+                  onChange={(e) => setDivorceMaleLastName(e.target.value)}
+                />
+                <InputField
+                  label="Female First Name"
+                  value={divorceFemaleFirstName}
+                  onChange={(e) => setDivorceFemaleFirstName(e.target.value)}
+                />
+                <InputField
+                  label="Female Middle Name"
+                  value={divorceFemaleMiddleName}
+                  onChange={(e) => setDivorceFemaleMiddleName(e.target.value)}
+                />
+                <InputField
+                  label="Female Last Name"
+                  value={divorceFemaleLastName}
+                  onChange={(e) => setDivorceFemaleLastName(e.target.value)}
+                />
+                <InputField
+                  label="Court Name"
+                  value={divorceCourtName}
+                  onChange={(e) => setDivorceCourtName(e.target.value)}
+                />
+                <InputField
+                  label="Divorce Date"
+                  value={divorceDate}
+                  onChange={(e) => setDivorceDate(e.target.value)}
+                />
+              </div>
+            )}
+          </form>
           <button
             onClick={handleUpdate}
-            className="mt-6 bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600"
+            className="mt-6 bg-green-500 text-white p-3 rounded-lg hover:bg-green-600"
           >
             Update Event
           </button>
-        </>
-      )}
-
-      {/* Divorce Details */}
-      {selectedEvent && eventType === "divorce" && (
-        <>
-          <SectionHeader title="Divorce Details" />
-
-          <div className="grid grid-cols-3 gap-4">
-            <InputField
-              label="Male Spouse First Name"
-              id="divorce-male-first-name"
-              value={divorceMaleFirstName}
-              onChange={(e) => setDivorceMaleFirstName(e.target.value)}
-            />
-            <InputField
-              label="Male Spouse Middle Name"
-              id="divorce-male-middle-name"
-              value={divorceMaleMiddleName}
-              onChange={(e) => setDivorceMaleMiddleName(e.target.value)}
-            />
-            <InputField
-              label="Male Spouse Last Name"
-              id="divorce-male-last-name"
-              value={divorceMaleLastName}
-              onChange={(e) => setDivorceMaleLastName(e.target.value)}
-            />
-          </div>
-
-          <div className="grid grid-cols-3 gap-4 mt-4">
-            <InputField
-              label="Female Spouse First Name"
-              id="divorce-female-first-name"
-              value={divorceFemaleFirstName}
-              onChange={(e) => setDivorceFemaleFirstName(e.target.value)}
-            />
-            <InputField
-              label="Female Spouse Middle Name"
-              id="divorce-female-middle-name"
-              value={divorceFemaleMiddleName}
-              onChange={(e) => setDivorceFemaleMiddleName(e.target.value)}
-            />
-            <InputField
-              label="Female Spouse Last Name"
-              id="divorce-female-last-name"
-              value={divorceFemaleLastName}
-              onChange={(e) => setDivorceFemaleLastName(e.target.value)}
-            />
-          </div>
-
-          <InputField
-            label="Court Name"
-            id="divorce-court-name"
-            value={divorceCourtName}
-            onChange={(e) => setDivorceCourtName(e.target.value)}
-          />
-
-          <InputField
-            label="Date of Divorce"
-            id="divorce-date"
-            type="date"
-            value={divorceDate}
-            onChange={(e) => setDivorceDate(e.target.value)}
-          />
-
-          <button
-            onClick={handleUpdate}
-            className="mt-6 bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600"
-          >
-            Update Event
-          </button>
-        </>
+        </div>
       )}
     </div>
   );

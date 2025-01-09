@@ -7,7 +7,7 @@ export default function AddUserPage() {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
-    role: "registrar", // Default role
+    role: "REGISTRAR", // Default role
     password: "",
     confirmPassword: "",
   });
@@ -44,8 +44,21 @@ export default function AddUserPage() {
       return;
     }
 
-    // Perform the API call or logic to add the user
-    console.log("User Data Submitted:", formData);
+    // Get existing users from localStorage or initialize an empty array
+    const existingUsers = JSON.parse(localStorage.getItem("users")) || [];
+
+    // Add the new user to the array
+    const newUser = {
+      username: formData.username,
+      email: formData.email,
+      role: formData.role,
+      password: formData.password, // Ideally, passwords should be hashed before storing
+    };
+    existingUsers.push(newUser);
+
+    // Save the updated users array back to localStorage
+    localStorage.setItem("users", JSON.stringify(existingUsers));
+
     alert("User has been successfully added.");
 
     // Clear the form
@@ -59,8 +72,7 @@ export default function AddUserPage() {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100"
-    >
+    <div className="flex items-center justify-center h-screen bg-gray-100">
       <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
         <SectionHeader title="Add New User" />
         <form onSubmit={handleSubmit}>
@@ -102,8 +114,8 @@ export default function AddUserPage() {
                 handleChange({ target: { name: "role", value: e.target.value } })
               }
               options={[
-                { label: "Registrar", value: "registrar" },
-                { label: "Official", value: "official" },
+                { label: "Registrar", value: "REGISTRAR" },
+                { label: "Official", value: "OFFICIAL" },
               ]}
             />
           </div>

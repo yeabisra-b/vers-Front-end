@@ -184,6 +184,60 @@ export default function TempPage() {
     return errors;
   };
 
+  const saveToLocalStorage = () => {
+    const newId = Math.floor(Math.random() * 100000);
+    const newEvent = {
+      id: newId,
+      eventType,
+      successMessage,
+      fieldErrors,
+      // Common fields
+      firstName,
+      middleName,
+      lastName,
+      gender,
+      // Birth-specific fields
+      motherFirstName,
+      motherMiddleName,
+      motherLastName,
+      birthWeight,
+      dateOfBirth,
+      region,
+      zone,
+      woreda,
+      phoneNumber,
+      // Death-specific fields
+      causeOfDeath,
+      declaredFirstName,
+      declaredMiddleName,
+      declaredLastName,
+      dateOfDeath,
+      deathRegion,
+      deathZone,
+      deathWoreda,
+      deathSpecificPlace,
+      // Marriage-specific fields
+      maleSpouseName,
+      femaleSpouseName,
+      witnesses,
+      dateOfMarriage,
+      courtName,
+      dateOfDivorce,
+    };
+  
+    // Retrieve the current events array from localStorage
+    const existingEvents = JSON.parse(localStorage.getItem("events")) || [];
+  
+    // Add the new event to the array
+    existingEvents.push(newEvent);
+  
+    // Save the updated array back to localStorage
+    localStorage.setItem("events", JSON.stringify(existingEvents));
+  
+    setSuccessMessage("Event added successfully!");
+  };
+  
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -197,6 +251,7 @@ export default function TempPage() {
 
     // Simulate successful submission
     setSuccessMessage("Registered Successfully!");
+    saveToLocalStorage();
     setFieldErrors({});
     resetFields();
   };

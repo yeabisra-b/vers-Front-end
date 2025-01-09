@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -8,8 +8,9 @@ import eyePasswordHide from "../../public/images/eye-password-hide.svg";
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false); 
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [storedUsers, setStoredUsers] = useState([]);
 
   const mockUsers = [
     { username: "adminUser", password: "adminPass", role: "ADMIN" },
@@ -23,19 +24,46 @@ export default function LoginPage() {
     OFFICIAL: "/officialdashboard",
   };
 
+  // Load users from localStorage on component mount
+  useEffect(() => {
+    const localStorageUsers = JSON.parse(localStorage.getItem("users")) || [];
+    setStoredUsers(localStorageUsers);
+  }, []);
+
   const handleLogin = (e) => {
     e.preventDefault();
-    const user = mockUsers.find(
+
+    // Check in mock users
+    const userFromMock = mockUsers.find(
       (u) =>
         u.username.toLowerCase() === username.toLowerCase() &&
         u.password === password
     );
 
-    if (user) {
-      window.location.href = roleDashboardMap[user.role];
-    } else {
-      setError("Invalid username or password. Please try again.");
+    if (userFromMock) {
+      localStorage.setItem("loggedin-username", userFromMock.username);
+      window.location.href = roleDashboardMap[userFromMock.role];
+      return;
     }
+
+    // Check in localStorage users
+    const userFromStorage = storedUsers.find(
+      (u) =>
+        u.username.toLowerCase() === username.toLowerCase() &&
+        u.password === password
+    );
+
+    if (userFromStorage) {
+      
+      localStorage.setItem("loggedin-username", userFromStorage.username);
+      window.location.href = roleDashboardMap[userFromStorage.role];
+      return;
+    }
+
+    localStorage.setItem("loggedin-username", )
+
+    // If no user is found
+    setError("Invalid username or password. Please try again.");
   };
 
   return (
