@@ -49,14 +49,15 @@ const UpdateEventPage = () => {
   useEffect(() => {
     // Load from local storage
     const savedEvents = JSON.parse(localStorage.getItem("events"));
-    const filtered = savedEvents.filter(
-      (event) => event.eventType === "birth" || event.eventType === "death"
-    );
-    if (filtered) {
-      setEvents(filtered);
-      setFilteredEvents(filtered);
+    if (savedEvents) {
+      const filtered = savedEvents.filter(
+        (event) => event.eventType === "birth" || event.eventType === "death"
+      );
+      if (filtered) {
+        setEvents(filtered);
+        setFilteredEvents(filtered);
+      }
     }
-    console.log(filtered);
   }, []);
 
 
