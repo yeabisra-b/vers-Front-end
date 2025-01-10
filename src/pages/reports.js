@@ -13,39 +13,80 @@ export default function GenerateReportsPage() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    const updatedFilters = { ...filters, [name]: value };
-    setFilters(updatedFilters);
-
-    // Automatically generate the report when filters are updated
-    handleGenerateReport(updatedFilters);
+    setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleGenerateReport = async (currentFilters = filters) => {
-    // Simulating an API call with dummy data
+  const handleGenerateReport = () => {
+    // Dummy data for simulation
     const simulatedResponse = {
-      totalWomen: 1200,
-      totalMen: 1300,
-      totalDivorced: 200,
-      totalMarried: 1800,
+      totalPopulation: 5,
+      totalWomen: 2,
+      totalMen: 3,
+      totalMarried: 1,
+      totalMarriedWomen: 1,
+      totalMarriedMen: 1,
+      totalSingle: 1,
+      totalSingleWomen: 0,
+      totalSingleMen: 1,
+      totalDivorced: 2,
+      totalDivorcedWomen: 1,
+      totalDivorcedMen: 1,
+      ageRangeDistribution: {
+        "0-18": 4,
+        "18-25": 0,
+        "26-35": 0,
+        "36-50": 1,
+        "51+": 0,
+      },
+      registrationYears: {
+        2025: 5,
+        2024: 0,
+        2023: 0,
+        2022: 0,
+        2021: 0,
+      },
     };
 
-    // Simulating dynamic filtering logic based on filters
-    let filteredData = { ...simulatedResponse };
+    // Filtering logic
+    let filteredData = {};
 
-    if (currentFilters.gender === "female") {
-      filteredData = { totalWomen: simulatedResponse.totalWomen };
+    if (filters.gender) {
+      if (filters.gender === "female") {
+        filteredData.totalWomen = simulatedResponse.totalWomen;
+        filteredData.totalMarriedWomen = simulatedResponse.totalMarriedWomen;
+        filteredData.totalSingleWomen = simulatedResponse.totalSingleWomen;
+        filteredData.totalDivorcedWomen = simulatedResponse.totalDivorcedWomen;
+      } else if (filters.gender === "male") {
+        filteredData.totalMen = simulatedResponse.totalMen;
+        filteredData.totalMarriedMen = simulatedResponse.totalMarriedMen;
+        filteredData.totalSingleMen = simulatedResponse.totalSingleMen;
+        filteredData.totalDivorcedMen = simulatedResponse.totalDivorcedMen;
+      }
+    } else {
+      // Include total population data if no gender filter
+      filteredData.totalPopulation = simulatedResponse.totalPopulation;
     }
-    if (currentFilters.gender === "male") {
-      filteredData = { totalMen: simulatedResponse.totalMen };
+
+    if (filters.maritalStatus) {
+      if (filters.maritalStatus === "married") {
+        filteredData.totalMarried = simulatedResponse.totalMarried;
+      } else if (filters.maritalStatus === "single") {
+        filteredData.totalSingle = simulatedResponse.totalSingle;
+      } else if (filters.maritalStatus === "divorced") {
+        filteredData.totalDivorced = simulatedResponse.totalDivorced;
+      }
     }
-    if (currentFilters.maritalStatus === "divorced") {
-      filteredData = { totalDivorced: simulatedResponse.totalDivorced };
+
+    if (filters.ageRange) {
+      filteredData.ageRangeDistribution = {
+        [filters.ageRange]: simulatedResponse.ageRangeDistribution[filters.ageRange],
+      };
     }
-    if (currentFilters.maritalStatus === "married") {
-      filteredData = { totalMarried: simulatedResponse.totalMarried };
-    }
-    if (currentFilters.registrationYear) {
-      filteredData.registrationYear = currentFilters.registrationYear; // Just a placeholder for logic
+
+    if (filters.registrationYear) {
+      filteredData.registrationYears = {
+        [filters.registrationYear]: simulatedResponse.registrationYears[filters.registrationYear],
+      };
     }
 
     setReportResults(filteredData);
@@ -127,26 +168,48 @@ export default function GenerateReportsPage() {
               })
             }
             options={[
-              { label: "Select Year", value: "" }, // Default option
+              { label: "Select Year", value: "" },
               ...Array.from({ length: 100 }, (_, i) => {
-                const year = new Date().getFullYear() - i; // Generate past 100 years
+                const year = new Date().getFullYear() - i;
                 return { label: `${year}`, value: `${year}` };
               }),
             ]}
           />
         </div>
 
+        {/* Generate Button */}
+        <button
+          onClick={handleGenerateReport}
+          className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg mt-4 hover:bg-blue-700"
+        >
+          Generate Report
+        </button>
+
         {/* Report Results */}
         {reportResults && (
           <div className="mt-6">
             <h3 className="text-xl font-semibold mb-2">Report Results</h3>
             <div className="bg-gray-50 p-4 rounded-lg shadow-inner">
-              {Object.entries(reportResults).map(([key, value]) => (
-                <p key={key} className="text-gray-700">
-                  <strong>{key.replace(/([A-Z])/g, " $1")}: </strong>
-                  {value}
-                </p>
-              ))}
+              {Object.entries(reportResults).map(([key, value]) =>
+                typeof value === "object" ? (
+                  <div key={key}>
+                    <p className="text-gray-800 font-semibold">{key.replace(/([A-Z])/g, " $1")}</p>
+                    <ul className="ml-4">
+                      {Object.entries(value).map(([subKey, subValue]) => (
+                        <li key={subKey} className="text-gray-700">
+                          <strong>{subKey.replace(/([A-Z])/g, " $1")}: </strong>
+                          {subValue}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : (
+                  <p key={key} className="text-gray-700">
+                    <strong>{key.replace(/([A-Z])/g, " $1")}: </strong>
+                    {value}
+                  </p>
+                )
+              )}
             </div>
           </div>
         )}

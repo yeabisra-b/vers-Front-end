@@ -79,11 +79,11 @@ export default function ProfilePage() {
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
-      <h1 className="text-3xl font-semibold text-center mb-6">Your Profile</h1>
+      <h1 className="text-3xl font-semibold text-center mb-6">{profileData.username}'s profile</h1>
 
       {/* Personal Information */}
       <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-4">Personal Information</h2>
+        <h2 className="text-xl font-semibold mb-4 text-black">Personal Information</h2>
         <InputField
           label="Username"
           id="username"
@@ -102,7 +102,7 @@ export default function ProfilePage() {
 
       {/* Password Change */}
       <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-4">Change Password</h2>
+        <h2 className="text-xl font-semibold mb-4 text-black">Change Password</h2>
         <form onSubmit={handlePasswordSubmit}>
           <InputField
             label="Current Password"
