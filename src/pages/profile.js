@@ -1,144 +1,126 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import AppLayout from "../components/AppLayout";
 import InputField from "../components/InputField";
+import Notice from "../components/Notice";
+import { api } from "../lib/api";
+import { useSession } from "../lib/session";
+
+const EMPTY_PASSWORDS = { currentPassword: "", newPassword: "", confirmPassword: "" };
 
 export default function ProfilePage() {
-  const [profileData, setProfileData] = useState({
-    username: "",
-    email: "",
-    role: "registrar",
-  });
+  const session = useSession();
+  const [profile, setProfile] = useState(null);
+  const [passwordData, setPasswordData] = useState(EMPTY_PASSWORDS);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
-
-  const [passwordError, setPasswordError] = useState("");
-  const [user, setUser] = useState(null);
-
-  // Load profile data from local storage
   useEffect(() => {
-    const loggedInUsername = localStorage.getItem("loggedin-username");
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    const user = users.find((u) => u.username === loggedInUsername);
-    console.log(user);
-    setUser(user);
-    if (user) {
-      setProfileData({
-        username: user.username || "",
-        email: user.email || "",
-        role: user.role || "registrar",
-      });
-    }
-  }, []);
+    if (!session) return;
+    api("/me")
+      .then(setProfile)
+      .catch((err) => setError(err.message));
+  }, [session]);
+
+  if (!session) return null;
 
   const handlePasswordChange = (e) => {
-    const { name, value } = e.target;
-    setPasswordData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-    if (name === "newPassword" || name === "confirmPassword") {
-      setPasswordError(
-        name === "confirmPassword" && passwordData.newPassword !== value
-          ? "Passwords do not match."
-          : ""
-      );
-    }
+    setPasswordData({ ...passwordData, [e.target.name]: e.target.value });
   };
 
-  const handlePasswordSubmit = (e) => {
+  const passwordMismatch =
+    passwordData.confirmPassword !== "" &&
+    passwordData.newPassword !== passwordData.confirmPassword;
+
+  const handlePasswordSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setSuccess("");
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setPasswordError("Passwords do not match.");
+      setError("Passwords do not match.");
       return;
     }
-
-    console.log(user.password, passwordData.currentPassword);
-    if (passwordData.currentPassword !== user.password) {
-      setPasswordError("Invalid current password");
-      return;
+    try {
+      await api("/me/password", {
+        method: "PUT",
+        body: {
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword,
+        },
+      });
+      setSuccess("Password changed successfully.");
+      setPasswordData(EMPTY_PASSWORDS);
+    } catch (err) {
+      setError(err.message);
     }
-
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    const updatedUsers = users.map((u) =>
-      u.username === profileData.username
-        ? { ...u, password: passwordData.newPassword }
-        : u
-    );
-
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
-    alert("Password changed successfully.");
-    setPasswordData({
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
-      <h1 className="text-3xl font-semibold text-center mb-6">{profileData.username}'s profile</h1>
+    <AppLayout session={session} title={`${session.username}'s Profile`}>
+      <div className="max-w-2xl bg-white p-6 rounded-lg shadow-md">
+        <Notice error={error} success={success} />
 
-      {/* Personal Information */}
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-4 text-black">Personal Information</h2>
-        <InputField
-          label="Username"
-          id="username"
-          value={profileData.username}
-          onChange={() => {}}
-          disabled
-        />
-        <InputField
-          label="Email"
-          id="email"
-          value={profileData.email}
-          onChange={() => {}}
-          disabled
-        />
-      </div>
+        <div className="mb-6 space-y-4">
+          <h2 className="text-xl font-semibold text-black">Personal Information</h2>
+          <InputField label="Username" id="username" value={profile?.username || ""} disabled readOnly />
+          <InputField label="Email" id="email" value={profile?.email || ""} disabled readOnly />
+          <InputField label="Role" id="role" value={profile?.role || ""} disabled readOnly />
+          <InputField
+            label="Member Since"
+            id="created-at"
+            value={profile ? profile.createdAt.slice(0, 10) : ""}
+            disabled
+            readOnly
+          />
+        </div>
 
-      {/* Password Change */}
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-4 text-black">Change Password</h2>
-        <form onSubmit={handlePasswordSubmit}>
-          <InputField
-            label="Current Password"
-            id="current-password"
-            value={passwordData.currentPassword}
-            onChange={handlePasswordChange}
-            name="currentPassword"
-            type="password"
-          />
-          <InputField
-            label="New Password"
-            id="new-password"
-            value={passwordData.newPassword}
-            onChange={handlePasswordChange}
-            name="newPassword"
-            type="password"
-          />
-          <InputField
-            label="Confirm New Password"
-            id="confirm-password"
-            value={passwordData.confirmPassword}
-            onChange={handlePasswordChange}
-            name="confirmPassword"
-            type="password"
-          />
-          {passwordError && (
-            <p className="text-red-500 text-sm">{passwordError}</p>
-          )}
-          <button
-            type="submit"
-            className="w-full p-3 mt-6 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition duration-300"
-          >
-            Change Password
-          </button>
-        </form>
+        <div>
+          <h2 className="text-xl font-semibold mb-4 text-black">Change Password</h2>
+          <form onSubmit={handlePasswordSubmit} className="space-y-4">
+            <InputField
+              label="Current Password"
+              id="current-password"
+              name="currentPassword"
+              type="password"
+              value={passwordData.currentPassword}
+              onChange={handlePasswordChange}
+              required
+              autoComplete="current-password"
+            />
+            <InputField
+              label="New Password (at least 8 characters)"
+              id="new-password"
+              name="newPassword"
+              type="password"
+              value={passwordData.newPassword}
+              onChange={handlePasswordChange}
+              required
+              minLength={8}
+              autoComplete="new-password"
+            />
+            <div>
+              <InputField
+                label="Confirm New Password"
+                id="confirm-password"
+                name="confirmPassword"
+                type="password"
+                value={passwordData.confirmPassword}
+                onChange={handlePasswordChange}
+                required
+                autoComplete="new-password"
+              />
+              {passwordMismatch && (
+                <p className="text-red-500 text-sm mt-1">Passwords do not match.</p>
+              )}
+            </div>
+            <button
+              type="submit"
+              className="w-full p-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition duration-300"
+            >
+              Change Password
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
+    </AppLayout>
   );
 }

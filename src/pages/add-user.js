@@ -1,159 +1,114 @@
 import { useState } from "react";
-import InputField from "../components/InputField"; // Adjust the path based on your project structure
-import SectionHeader from "../components/SectionHeader";
+import AppLayout from "../components/AppLayout";
+import InputField from "../components/InputField";
+import Notice from "../components/Notice";
 import SelectField from "../components/SelectField";
+import { api } from "../lib/api";
+import { useSession } from "../lib/session";
+
+const EMPTY_FORM = {
+  username: "",
+  email: "",
+  role: "REGISTRAR",
+  password: "",
+  confirmPassword: "",
+};
 
 export default function AddUserPage() {
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    role: "REGISTRAR", // Default role
-    password: "",
-    confirmPassword: "",
-  });
+  const session = useSession(["ADMIN"]);
+  const [formData, setFormData] = useState(EMPTY_FORM);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const [passwordError, setPasswordError] = useState("");
+  if (!session) return null;
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-
-    // Password validation
-    if (name === "confirmPassword" || name === "password") {
-      if (
-        formData.password !== "" &&
-        name === "confirmPassword" &&
-        value !== formData.password
-      ) {
-        setPasswordError("Passwords do not match.");
-      } else {
-        setPasswordError("");
-      }
-    }
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const passwordMismatch =
+    formData.confirmPassword !== "" && formData.password !== formData.confirmPassword;
 
-    // Final password validation before submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match.");
+      setError("Passwords do not match.");
       return;
     }
-
-    // Get existing users from localStorage or initialize an empty array
-    const existingUsers = JSON.parse(localStorage.getItem("users")) || [];
-
-    // Add the new user to the array
-    const newUser = {
-      username: formData.username,
-      email: formData.email,
-      role: formData.role,
-      password: formData.password, // Ideally, passwords should be hashed before storing
-    };
-    existingUsers.push(newUser);
-
-    // Save the updated users array back to localStorage
-    localStorage.setItem("users", JSON.stringify(existingUsers));
-
-    alert("User has been successfully added.");
-
-    // Clear the form
-    setFormData({
-      username: "",
-      email: "",
-      role: "registrar",
-      password: "",
-      confirmPassword: "",
-    });
+    try {
+      const { confirmPassword: _, ...user } = formData;
+      await api("/admin/add-user", { method: "POST", body: user });
+      setSuccess(`User "${formData.username}" has been added.`);
+      setFormData(EMPTY_FORM);
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
+    <AppLayout session={session} title="Add New User">
       <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
-        <SectionHeader title="Add New User" />
-        <form onSubmit={handleSubmit}>
-          {/* Username */}
-          <div className="mb-4">
-            <InputField
-              label="Username"
-              id="username"
-              value={formData.username}
-              onChange={(e) =>
-                handleChange({ target: { name: "username", value: e.target.value } })
-              }
-              required={true}
-              type="text"
-            />
-          </div>
-
-          {/* Email */}
-          <div className="mb-4">
-            <InputField
-              label="Email"
-              id="email"
-              value={formData.email}
-              onChange={(e) =>
-                handleChange({ target: { name: "email", value: e.target.value } })
-              }
-              required={true}
-              type="email"
-            />
-          </div>
-
-          {/* Role */}
-          <div className="mb-4">
-            <SelectField
-              label="Role"
-              id="role"
-              value={formData.role}
-              onChange={(e) =>
-                handleChange({ target: { name: "role", value: e.target.value } })
-              }
-              options={[
-                { label: "Registrar", value: "REGISTRAR" },
-                { label: "Official", value: "OFFICIAL" },
-              ]}
-            />
-          </div>
-
-          {/* New Password */}
-          <div className="mb-4">
-            <InputField
-              label="New Password"
-              id="password"
-              value={formData.password}
-              onChange={(e) =>
-                handleChange({ target: { name: "password", value: e.target.value } })
-              }
-              required={true}
-              type="password"
-            />
-          </div>
-
-          {/* Confirm Password */}
-          <div className="mb-4">
+        <Notice error={error} success={success} />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <InputField
+            label="Username"
+            id="username"
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
+            required
+            minLength={4}
+            maxLength={64}
+          />
+          <InputField
+            label="Email"
+            id="email"
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+          <SelectField
+            label="Role"
+            id="role"
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            options={[
+              { label: "Registrar", value: "REGISTRAR" },
+              { label: "Official", value: "OFFICIAL" },
+              { label: "Admin", value: "ADMIN" },
+            ]}
+          />
+          <InputField
+            label="Password (at least 8 characters)"
+            id="password"
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            minLength={8}
+            autoComplete="new-password"
+          />
+          <div>
             <InputField
               label="Confirm Password"
               id="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={(e) =>
-                handleChange({
-                  target: { name: "confirmPassword", value: e.target.value },
-                })
-              }
-              required={true}
+              name="confirmPassword"
               type="password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+              autoComplete="new-password"
             />
-            {passwordError && (
-              <p className="text-red-500 text-sm mt-1">{passwordError}</p>
+            {passwordMismatch && (
+              <p className="text-red-500 text-sm mt-1">Passwords do not match.</p>
             )}
           </div>
-
-          {/* Submit Button */}
           <button
             type="submit"
             className="w-full py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition duration-300"
@@ -162,6 +117,6 @@ export default function AddUserPage() {
           </button>
         </form>
       </div>
-    </div>
+    </AppLayout>
   );
 }

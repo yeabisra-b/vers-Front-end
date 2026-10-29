@@ -1,219 +1,168 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import AppLayout from "../components/AppLayout";
+import Notice from "../components/Notice";
 import SelectField from "../components/SelectField";
+import { api } from "../lib/api";
+import { EVENT_TYPES, GENDERS, STATUSES, labelFor } from "../lib/events";
+import { useSession } from "../lib/session";
+
+const EMPTY_FILTERS = { type: "", status: "", gender: "", region: "", registrationYear: "" };
+
+const any = (label) => [{ label, value: "" }];
+
+/** One breakdown (e.g. events per type) as rows with proportional bars. */
+const Breakdown = ({ title, counts, labels }) => {
+  const entries = Object.entries(counts);
+  const max = Math.max(1, ...entries.map(([, count]) => count));
+  return (
+    <div className="bg-white p-4 rounded-lg shadow">
+      <h3 className="text-lg font-semibold text-black mb-3">{title}</h3>
+      {entries.length === 0 ? (
+        <p className="text-gray-500 m-0">No data.</p>
+      ) : (
+        <table className="w-full">
+          <tbody>
+            {entries.map(([key, count]) => (
+              <tr key={key}>
+                <td className="py-1 pr-3 text-gray-700 whitespace-nowrap">
+                  {labels ? labelFor(labels, key) : key}
+                </td>
+                <td className="py-1 w-full">
+                  <div className="h-3 bg-blue-500 rounded" style={{ width: `${(count / max) * 100}%` }} />
+                </td>
+                <td className="py-1 pl-3 text-right font-semibold text-black">{count}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+};
 
 export default function GenerateReportsPage() {
-  const [filters, setFilters] = useState({
-    gender: "",
-    maritalStatus: "",
-    ageRange: "",
-    registrationYear: "",
-  });
+  const session = useSession(["OFFICIAL", "ADMIN"]);
+  const [options, setOptions] = useState(null);
+  const [filters, setFilters] = useState(EMPTY_FILTERS);
+  const [report, setReport] = useState(null);
+  const [error, setError] = useState("");
 
-  const [reportResults, setReportResults] = useState(null);
+  useEffect(() => {
+    if (!session) return;
+    api("/official/reports/filters")
+      .then(setOptions)
+      .catch((err) => setError(err.message));
+  }, [session]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
-  };
+  if (!session) return null;
 
-  const handleGenerateReport = () => {
-    // Dummy data for simulation
-    const simulatedResponse = {
-      totalPopulation: 5,
-      totalWomen: 2,
-      totalMen: 3,
-      totalMarried: 1,
-      totalMarriedWomen: 1,
-      totalMarriedMen: 1,
-      totalSingle: 1,
-      totalSingleWomen: 0,
-      totalSingleMen: 1,
-      totalDivorced: 2,
-      totalDivorcedWomen: 1,
-      totalDivorcedMen: 1,
-      ageRangeDistribution: {
-        "0-18": 4,
-        "18-25": 0,
-        "26-35": 0,
-        "36-50": 1,
-        "51+": 0,
-      },
-      registrationYears: {
-        2025: 5,
-        2024: 0,
-        2023: 0,
-        2022: 0,
-        2021: 0,
-      },
-    };
+  const handleChange = (e) => setFilters({ ...filters, [e.target.name]: e.target.value });
 
-    // Filtering logic
-    let filteredData = {};
-
-    if (filters.gender) {
-      if (filters.gender === "female") {
-        filteredData.totalWomen = simulatedResponse.totalWomen;
-        filteredData.totalMarriedWomen = simulatedResponse.totalMarriedWomen;
-        filteredData.totalSingleWomen = simulatedResponse.totalSingleWomen;
-        filteredData.totalDivorcedWomen = simulatedResponse.totalDivorcedWomen;
-      } else if (filters.gender === "male") {
-        filteredData.totalMen = simulatedResponse.totalMen;
-        filteredData.totalMarriedMen = simulatedResponse.totalMarriedMen;
-        filteredData.totalSingleMen = simulatedResponse.totalSingleMen;
-        filteredData.totalDivorcedMen = simulatedResponse.totalDivorcedMen;
-      }
-    } else {
-      // Include total population data if no gender filter
-      filteredData.totalPopulation = simulatedResponse.totalPopulation;
+  const handleGenerateReport = async (e) => {
+    e.preventDefault();
+    setError("");
+    try {
+      setReport(await api("/official/reports", { query: filters }));
+    } catch (err) {
+      setError(err.message);
     }
-
-    if (filters.maritalStatus) {
-      if (filters.maritalStatus === "married") {
-        filteredData.totalMarried = simulatedResponse.totalMarried;
-      } else if (filters.maritalStatus === "single") {
-        filteredData.totalSingle = simulatedResponse.totalSingle;
-      } else if (filters.maritalStatus === "divorced") {
-        filteredData.totalDivorced = simulatedResponse.totalDivorced;
-      }
-    }
-
-    if (filters.ageRange) {
-      filteredData.ageRangeDistribution = {
-        [filters.ageRange]: simulatedResponse.ageRangeDistribution[filters.ageRange],
-      };
-    }
-
-    if (filters.registrationYear) {
-      filteredData.registrationYears = {
-        [filters.registrationYear]: simulatedResponse.registrationYears[filters.registrationYear],
-      };
-    }
-
-    setReportResults(filteredData);
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <div className="w-full max-w-lg bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-2xl font-semibold mb-6">Generate Reports</h2>
+    <AppLayout session={session} title="Generate Reports">
+      <Notice error={error} />
+      <form onSubmit={handleGenerateReport} className="bg-white p-6 rounded-lg shadow-md mb-6">
         <p className="text-gray-700 mb-4">
-          Select parameters below to generate specific reports.
+          Every filter is optional. The gender filter only counts births and deaths.
         </p>
-
-        {/* Filters Section */}
-        <div className="space-y-4">
-          {/* Gender Filter */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          <SelectField
+            label="Event Type"
+            id="type"
+            name="type"
+            value={filters.type}
+            onChange={handleChange}
+            options={[...any("Any"), ...EVENT_TYPES]}
+          />
+          <SelectField
+            label="Status"
+            id="status"
+            name="status"
+            value={filters.status}
+            onChange={handleChange}
+            options={[...any("Any"), ...STATUSES]}
+          />
           <SelectField
             label="Gender"
             id="gender"
+            name="gender"
             value={filters.gender}
-            onChange={(e) =>
-              handleChange({
-                target: { name: "gender", value: e.target.value },
-              })
-            }
-            options={[
-              { label: "Any", value: "" },
-              { label: "Male", value: "male" },
-              { label: "Female", value: "female" },
-            ]}
+            onChange={handleChange}
+            options={[...any("Any"), ...GENDERS]}
           />
-
-          {/* Marital Status Filter */}
           <SelectField
-            label="Marital Status"
-            id="maritalStatus"
-            value={filters.maritalStatus}
-            onChange={(e) =>
-              handleChange({
-                target: { name: "maritalStatus", value: e.target.value },
-              })
-            }
+            label="Region"
+            id="region"
+            name="region"
+            value={filters.region}
+            onChange={handleChange}
             options={[
-              { label: "Any", value: "" },
-              { label: "Single", value: "single" },
-              { label: "Married", value: "married" },
-              { label: "Divorced", value: "divorced" },
+              ...any("Any"),
+              ...(options?.regions || []).map((r) => ({ label: r, value: r })),
             ]}
           />
-
-          {/* Age Range Filter */}
-          <SelectField
-            label="Age Range"
-            id="ageRange"
-            value={filters.ageRange}
-            onChange={(e) =>
-              handleChange({
-                target: { name: "ageRange", value: e.target.value },
-              })
-            }
-            options={[
-              { label: "Any", value: "" },
-              { label: "0-18", value: "0-18" },
-              { label: "18-25", value: "18-25" },
-              { label: "26-35", value: "26-35" },
-              { label: "36-50", value: "36-50" },
-              { label: "51+", value: "51+" },
-            ]}
-          />
-
-          {/* Registration Year Filter */}
           <SelectField
             label="Registration Year"
             id="registrationYear"
-            value={filters.registrationYear || ""}
-            onChange={(e) =>
-              handleChange({
-                target: { name: "registrationYear", value: e.target.value },
-              })
-            }
+            name="registrationYear"
+            value={filters.registrationYear}
+            onChange={handleChange}
             options={[
-              { label: "Select Year", value: "" },
-              ...Array.from({ length: 100 }, (_, i) => {
-                const year = new Date().getFullYear() - i;
-                return { label: `${year}`, value: `${year}` };
-              }),
+              ...any("Any"),
+              ...(options?.registrationYears || []).map((y) => ({ label: `${y}`, value: `${y}` })),
             ]}
           />
         </div>
+        <div className="flex gap-4 mt-6">
+          <button type="submit" className="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700">
+            Generate Report
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setFilters(EMPTY_FILTERS);
+              setReport(null);
+            }}
+            className="bg-gray-300 text-black py-2 px-6 rounded-lg hover:bg-gray-400"
+          >
+            Clear
+          </button>
+        </div>
+      </form>
 
-        {/* Generate Button */}
-        <button
-          onClick={handleGenerateReport}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg mt-4 hover:bg-blue-700"
-        >
-          Generate Report
-        </button>
-
-        {/* Report Results */}
-        {reportResults && (
-          <div className="mt-6">
-            <h3 className="text-xl font-semibold mb-2">Report Results</h3>
-            <div className="bg-gray-50 p-4 rounded-lg shadow-inner">
-              {Object.entries(reportResults).map(([key, value]) =>
-                typeof value === "object" ? (
-                  <div key={key}>
-                    <p className="text-gray-800 font-semibold">{key.replace(/([A-Z])/g, " $1")}</p>
-                    <ul className="ml-4">
-                      {Object.entries(value).map(([subKey, subValue]) => (
-                        <li key={subKey} className="text-gray-700">
-                          <strong>{subKey.replace(/([A-Z])/g, " $1")}: </strong>
-                          {subValue}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : (
-                  <p key={key} className="text-gray-700">
-                    <strong>{key.replace(/([A-Z])/g, " $1")}: </strong>
-                    {value}
-                  </p>
-                )
-              )}
+      {report && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="bg-white p-4 rounded-lg shadow">
+              <p className="text-gray-500 m-0">Total events</p>
+              <p className="text-4xl font-bold text-black m-0">{report.totalEvents}</p>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow">
+              <p className="text-gray-500 m-0">Average birth weight</p>
+              <p className="text-4xl font-bold text-black m-0">
+                {report.averageBirthWeight == null ? "—" : `${report.averageBirthWeight} kg`}
+              </p>
             </div>
           </div>
-        )}
-      </div>
-    </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Breakdown title="By Event Type" counts={report.byType} labels={EVENT_TYPES} />
+            <Breakdown title="By Status" counts={report.byStatus} labels={STATUSES} />
+            <Breakdown title="By Gender (births and deaths)" counts={report.byGender} labels={GENDERS} />
+            <Breakdown title="By Region" counts={report.byRegion} />
+            <Breakdown title="By Registration Month" counts={report.byMonth} />
+          </div>
+        </div>
+      )}
+    </AppLayout>
   );
 }

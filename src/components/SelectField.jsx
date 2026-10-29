@@ -1,14 +1,16 @@
 import React from "react";
 
-const SelectField = ({ label, id, value, onChange, options }) => (
-  <div className="mt-6">
+const SelectField = ({ label, id, value, onChange, options, required = false, name }) => (
+  <div>
     <label htmlFor={id} className="block text-lg font-medium text-black">
       {label}
     </label>
     <select
       id={id}
+      name={name}
       value={value}
       onChange={onChange}
+      required={required}
       className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-red-500 text-black"
     >
       {options.map((option) => (

@@ -1,69 +1,42 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/router";
 
 import eyePasswordShow from "../../public/images/eye-password-show.svg";
 import eyePasswordHide from "../../public/images/eye-password-hide.svg";
+import { api } from "../lib/api";
+import { DASHBOARD_FOR_ROLE, getSession, saveSession } from "../lib/session";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const [storedUsers, setStoredUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const mockUsers = [
-    { username: "adminUser", password: "adminPass", role: "ADMIN" },
-    { username: "registrarUser", password: "registrarPass", role: "REGISTRAR" },
-    { username: "officialUser", password: "officialPass", role: "OFFICIAL" },
-  ];
-
-  const roleDashboardMap = {
-    ADMIN: "/admindashboard",
-    REGISTRAR: "/registrardashboard",
-    OFFICIAL: "/officialdashboard",
-  };
-
-  // Load users from localStorage on component mount
+  // Already logged in: go straight to the dashboard
   useEffect(() => {
-    const localStorageUsers = JSON.parse(localStorage.getItem("users")) || [];
-    setStoredUsers(localStorageUsers);
-  }, []);
+    const session = getSession();
+    if (session) router.replace(DASHBOARD_FOR_ROLE[session.role]);
+  }, [router]);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-
-    // Check in mock users
-    const userFromMock = mockUsers.find(
-      (u) =>
-        u.username.toLowerCase() === username.toLowerCase() &&
-        u.password === password
-    );
-
-    if (userFromMock) {
-      localStorage.setItem("loggedin-username", userFromMock.username);
-      window.location.href = roleDashboardMap[userFromMock.role];
-      return;
+    setError("");
+    setLoading(true);
+    try {
+      const session = await api("/login", {
+        method: "POST",
+        body: { username: username.trim(), password },
+      });
+      saveSession(session);
+      router.push(DASHBOARD_FOR_ROLE[session.role]);
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
     }
-
-    // Check in localStorage users
-    const userFromStorage = storedUsers.find(
-      (u) =>
-        u.username.toLowerCase() === username.toLowerCase() &&
-        u.password === password
-    );
-
-    if (userFromStorage) {
-      
-      localStorage.setItem("loggedin-username", userFromStorage.username);
-      window.location.href = roleDashboardMap[userFromStorage.role];
-      return;
-    }
-
-    localStorage.setItem("loggedin-username", )
-
-    // If no user is found
-    setError("Invalid username or password. Please try again.");
   };
 
   return (
@@ -89,6 +62,7 @@ export default function LoginPage() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="w-full p-3 mt-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+              autoComplete="username"
               required
             />
           </div>
@@ -106,16 +80,17 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full p-3 mt-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                autoComplete="current-password"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-3 flex items-center"
+                className="absolute inset-y-0 right-3 mt-2 flex items-center"
               >
                 <Image
-                  src={showPassword ? eyePasswordShow : eyePasswordHide}
-                  alt="Toggle Password Visibility"
+                  src={showPassword ? eyePasswordHide : eyePasswordShow}
+                  alt={showPassword ? "Hide password" : "Show password"}
                   width={24}
                   height={24}
                 />
@@ -125,9 +100,10 @@ export default function LoginPage() {
           {error && <div className="text-red-500 text-sm">{error}</div>}
           <button
             type="submit"
-            className="w-full p-3 mt-6 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition duration-300"
+            disabled={loading}
+            className="w-full p-3 mt-6 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition duration-300 disabled:opacity-60"
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
       </div>

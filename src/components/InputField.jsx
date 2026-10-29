@@ -9,6 +9,7 @@ const InputField = ({
   required = false,
   disabled = false,
   name,
+  ...inputProps
 }) => (
   <div>
     <label htmlFor={id} className="block text-lg font-medium text-black">
@@ -25,6 +26,7 @@ const InputField = ({
       required={required}
       disabled={disabled}
       name={name}
+      {...inputProps}
     />
   </div>
 );

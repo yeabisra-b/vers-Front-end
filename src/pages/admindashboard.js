@@ -1,73 +1,33 @@
 import Link from "next/link";
+import AppLayout from "../components/AppLayout";
+import { useSession } from "../lib/session";
 
-export default function OfficialDashboardPage() {
+const CARDS = [
+  { href: "/add-user", label: "Add a User" },
+  { href: "/search-remove-user", label: "Manage Users" },
+  { href: "/register", label: "Register New Event" },
+  { href: "/update", label: "Update Events" },
+  { href: "/review", label: "Review Events" },
+  { href: "/reports", label: "Generate Reports" },
+];
+
+export default function AdminDashboardPage() {
+  const session = useSession(["ADMIN"]);
+  if (!session) return null;
+
   return (
-    <div className="flex h-screen">
-      {/* Sidebar */}
-      <div className="w-64 bg-gray-800 text-white p-6">
-        <h2 className="text-2xl font-bold mb-6">Admin Dashboard</h2>
-        <ul className="space-y-4">
-          <li>
-            <Link
-              href="/about"
-              className="flex items-center gap-2 text-white hover:text-gray-300 transition duration-200"
-            >
-              <span>ℹ️</span> About
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/profile"
-              className="flex items-center gap-2 text-white hover:text-gray-300 transition duration-200"
-            >
-              <span>👤</span> Profile
-            </Link>
-          </li>
-        </ul>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 bg-gray-100 p-8">
-        {/* Header */}
-        <header className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-semibold">Welcome, Admin</h1>
-          <button
-            onClick={() => {
-              if (window.confirm("Are you sure you want to logout?")) {
-                window.location.href = "/login";
-              }
-            }}
-            className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-300"
+    <AppLayout session={session} title="Welcome, Admin">
+      <section className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        {CARDS.map((card) => (
+          <Link
+            key={card.href}
+            href={card.href}
+            className="p-6 bg-blue-500 text-white text-center font-semibold rounded-lg shadow-lg hover:bg-blue-600 hover:no-underline transition duration-300"
           >
-            Logout
-          </button>
-        </header>
-
-        {/* Main Section */}
-        <section>
-          <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-            Manage Users
-          </h2>
-          {/* Action Buttons */}
-          <div className="space-y-4">
-            {/* Button to Add a Registrar */}
-            <button
-              onClick={() => (window.location.href = "/add-user")}
-              className="block w-full max-w-sm p-4 bg-blue-500 text-white text-center font-semibold rounded-lg hover:bg-blue-600 transition duration-300"
-            >
-              Add a User
-            </button>
-
-            {/* Button to Remove a Registrar */}
-            <button
-              onClick={() => (window.location.href = "/search-remove-user")}
-              className="block w-full max-w-sm p-4 bg-blue-500 text-white text-center font-semibold rounded-lg hover:bg-blue-600 transition duration-300"
-            >
-              Remove a User
-            </button>
-          </div>
-        </section>
-      </div>
-    </div>
+            {card.label}
+          </Link>
+        ))}
+      </section>
+    </AppLayout>
   );
 }
